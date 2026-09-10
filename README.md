@@ -67,6 +67,19 @@ dispositivos permanecem como evolução futura.
 
 ## Organização do trabalho
 
-As tarefas são acompanhadas no **GitHub Projects** deste repositório. Cada card P01–P12
-corresponde a uma etapa do planejamento da seção 6 do documento, com responsável, prazo,
-critério de conclusão e referência à tela ou requisito.
+Quadro: **[DirectChannel — UX/UI Turma AX](https://github.com/users/JonathanBufon/projects/2)**
+
+Cada card P01–P12 corresponde a uma etapa do planejamento da seção 6 do documento e
+carrega os campos obrigatórios: responsável, prazo, estado, critério de conclusão,
+referência à tela ou requisito, e evidência do trabalho e da revisão.
+
+| Coluna | Significado |
+|---|---|
+| A Fazer | Cards descritos e prontos para começar |
+| Em Andamento | Uma pessoa responsável executa o card |
+| Em Revisão | Outro integrante verifica os critérios |
+| Concluído | Entrega validada e evidência anexada |
+
+Cada integrante assume seus cards e registra autoria, comentários e revisões na própria
+ferramenta — cargos genéricos e capturas isoladas não substituem nomes e histórico de
+participação.
