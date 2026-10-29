@@ -1,26 +1,54 @@
 // mobile/src/screens/LoginScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { RootNavigationProp } from '../../types/navigation';
 import { CenteredTemplate } from '../../components/templates/CenteredTemplate';
 import { LoginForm, LoginFormData } from '../../components/organisms/LoginForm';
 import { Label } from '../../components/atoms/Label';
 import { colors, spacing, radii } from '../../theme';
+import { saveAuthToken, saveUserProfile, getAuthToken } from '../../services/storage';
 
 export const LoginScreen: React.FC = () => {
-  // Estado assíncrono controlado pela Screen
+  const navigation = useNavigation<RootNavigationProp>();
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
 
-  // Orquestrador de submissão do formulário
+  // Splash relê sessão persistida
+  useEffect(() => {
+    async function checkExistingSession() {
+      const existingToken = await getAuthToken();
+      if (existingToken) {
+        navigation.replace('Main');
+      }
+    }
+    checkExistingSession();
+  }, [navigation]);
+
   const handleLoginSubmit = async (credentials: LoginFormData) => {
     setIsLoading(true);
     setApiError(null);
 
     try {
-      // Simulação da chamada de autenticação (será substituída por services/auth.ts)
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // Simulação da resposta da API com Token JWT e Perfil
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      Alert.alert('Sucesso', `Autenticado com: ${credentials.email}`);
+      const mockJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.directchannel_secure_payload';
+
+      // 1. Salva Token no Cofre (SecureStore)
+      await saveAuthToken(mockJwtToken);
+
+      // 2. Salva Dados Públicos no AsyncStorage
+      await saveUserProfile({
+        id: 'usr_1',
+        name: credentials.email.split('@')[0],
+        username: `@${credentials.email.split('@')[0]}`,
+        email: credentials.email,
+        avatarUri: null,
+      });
+
+      // 3. Navega com replace (remove o login da pilha)
+      navigation.replace('Main');
     } catch (error) {
       setApiError('Não foi possível conectar ao servidor. Tente novamente.');
     } finally {
@@ -28,7 +56,6 @@ export const LoginScreen: React.FC = () => {
     }
   };
 
-  // Cabeçalho oficial DirectChannel (Logo "D" + Título + Subtítulo)
   const renderHeader = () => (
     <View style={styles.header}>
       <View style={styles.logoBadge}>
@@ -51,8 +78,8 @@ export const LoginScreen: React.FC = () => {
         onSubmit={handleLoginSubmit}
         isLoading={isLoading}
         errorMessage={apiError}
-        onForgotPassword={() => Alert.alert('Navegação', 'Ir para T03 (Recuperar acesso)')}
-        onCreateAccount={() => Alert.alert('Navegação', 'Ir para T02 (Criar conta)')}
+        onForgotPassword={() => Alert.alert('Navegação', 'T03 - Recuperar acesso')}
+        onCreateAccount={() => Alert.alert('Navegação', 'T02 - Criar conta')}
       />
     </CenteredTemplate>
   );
