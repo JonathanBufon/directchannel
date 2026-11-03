@@ -18,8 +18,8 @@ git push -u origin main
 ```bash
 git clone https://github.com/ORGANIZACAO/DirectChannel.git
 cd DirectChannel
-cp .env.example .env
-./scripts/bootstrap.sh
+cp infra/.env.example infra/.env
+./infra/scripts/bootstrap.sh
 # configure o IP da API em mobile/.env, as senhas e instale dependências
 ```
 

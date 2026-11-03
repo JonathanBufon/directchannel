@@ -1,41 +1,49 @@
 # DirectChannel
 
-Projeto de experiência e interface (UX/UI) de um aplicativo mobile de mensageria com
-**criptografia de ponta a ponta desde o MVP**.
-
-> **Escopo desta fase:** especificação e prototipação. Este repositório não contém um
-> aplicativo implementado — o entregável é o documento de UX/UI, requisitos e o
-> planejamento do trabalho.
-
-## Entrega
+Aplicativo mobile de mensageria para pessoas e pequenos grupos que priorizam a privacidade
+de suas conversas e arquivos, com **criptografia de ponta a ponta desde o MVP**. O conteúdo
+é cifrado antes de sair do dispositivo; servidor e administrador não possuem chaves de leitura.
 
 | | |
 |---|---|
 | Disciplina | Desenvolvimento para dispositivos móveis |
 | Turma | AX |
-| Data de entrega | 10 de setembro de 2026 |
+| Integrantes | Jonathan Bufon · Rafael Merisio Neto · Jaider Armando Marquina Miranda |
 
-**Integrantes:** Jonathan Bufon · Rafael Merisio Neto · Jaider Armando Marquina Miranda
+## Documentação
 
-## Documento
+| Documento | Conteúdo |
+|---|---|
+| [Projeto UX/UI (PDF)](docs/directchannel-projeto-ux-ui.pdf) | Escopo, perfis, mapa de navegação, wireframes, protótipo, requisitos RF01–RF27 / RNF01–RNF20 |
+| [Instalação e ambiente](docs/SETUP.md) | Tecnologias, primeira instalação, Docker, Expo e segurança |
+| [Arquitetura](docs/ARQUITETURA.md) | Camadas mobile/API, persistência, tempo real e modelo de dados |
+| [CRUDs](docs/CRUDS.md) | Divisão dos 6 CRUDs entre a equipe e contratos REST |
+| [Colaboração no GitHub](docs/GITHUB.md) | Clonagem, branches e Pull Requests |
+| [Mobile](mobile/readme.md) | Execução do app Expo e padrões (Atomic Design) |
+| [Infra](infra/README.md) | Compose, variáveis de ambiente e scripts |
 
-[`docs/directchannel-projeto-ux-ui.pdf`](docs/directchannel-projeto-ux-ui.pdf) — 44 páginas,
-com protótipo navegável por links internos.
+## Estrutura
 
-1. Descrição do aplicativo, perfis e escopo
-2. Mapa de navegação (usuário, grupos e administração)
-3. Wireframes em baixa fidelidade
-4. Interface, identidade visual e protótipo de alta fidelidade
-5. Requisitos rastreáveis (RF01–RF27 / RNF01–RNF20) e avaliação dos fluxos
-6. Organização do trabalho
+```text
+directchannel/
+├── backend/   # API Laravel: app/Http, Models, Services, Policies, Events, database
+├── mobile/    # App Expo + TypeScript: src/components, screens, navigation, services
+├── infra/     # compose.yaml, .env.example e scripts/bootstrap.sh
+└── docs/      # documento UX/UI, arquitetura, CRUDs, setup e colaboração
+```
 
-## Visão geral
+## Início rápido
 
-DirectChannel é um aplicativo de mensageria para pessoas e pequenos grupos que priorizam
-a privacidade de suas conversas e arquivos. O conteúdo é cifrado antes de sair do
-dispositivo; servidor e administrador não possuem chaves de leitura.
+```bash
+cp infra/.env.example infra/.env          # defina DB_PASSWORD
+./infra/scripts/bootstrap.sh              # gera Laravel/Expo se ainda não existirem
+docker compose -f infra/compose.yaml up -d --build
+cd mobile && npm install && npx expo start
+```
 
-**Perfis**
+Passo a passo completo em [docs/SETUP.md](docs/SETUP.md).
+
+## Perfis
 
 | Perfil | O que faz | Limite de acesso |
 |---|---|---|
@@ -47,14 +55,8 @@ dispositivo; servidor e administrador não possuem chaves de leitura.
 e em grupo, mensagens em tempo real, histórico, entrega e leitura opcional, anexos,
 verificação de contato, bloqueio, denúncia e administração.
 
-**Fora desta entrega:** implementação de código, backend, banco de dados, envio real de
-mensagens e execução da criptografia. Chamadas, bots, integrações e múltiplos
-dispositivos permanecem como evolução futura.
-
-## Telas
-
-- **T01–T24** — fluxos do usuário: acesso, conversas, arquivos, contato, grupos, perfil e preferências
-- **A01–A06** — administração: painel, usuários, contas, denúncias e configurações
+**Telas:** T01–T24 (fluxos do usuário) e A01–A06 (administração) — ver o
+[documento UX/UI](docs/directchannel-projeto-ux-ui.pdf).
 
 ## Identidade visual
 
@@ -67,11 +69,7 @@ dispositivos permanecem como evolução futura.
 
 ## Organização do trabalho
 
-Quadro: **[DirectChannel — UX/UI Turma AX](https://github.com/users/JonathanBufon/projects/2)**
-
-Cada card P01–P12 corresponde a uma etapa do planejamento da seção 6 do documento e
-carrega os campos obrigatórios: responsável, prazo, estado, critério de conclusão,
-referência à tela ou requisito, e evidência do trabalho e da revisão.
+Quadro: **[DirectChannel — GitHub Projects](https://github.com/users/JonathanBufon/projects/2)**
 
 | Coluna | Significado |
 |---|---|
@@ -80,6 +78,5 @@ referência à tela ou requisito, e evidência do trabalho e da revisão.
 | Em Revisão | Outro integrante verifica os critérios |
 | Concluído | Entrega validada e evidência anexada |
 
-Cada integrante assume seus cards e registra autoria, comentários e revisões na própria
-ferramenta — cargos genéricos e capturas isoladas não substituem nomes e histórico de
-participação.
+Divisão dos CRUDs por integrante em [docs/CRUDS.md](docs/CRUDS.md); fluxo de branches e PRs em
+[docs/GITHUB.md](docs/GITHUB.md).

@@ -1,0 +1,38 @@
+name: directchannel
+
+services:
+  api:
+    build: ../backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ../backend:/var/www/html
+    environment:
+      APP_ENV: local
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_DATABASE: directchannel
+      DB_USERNAME: directchannel
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD em infra/.env}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: directchannel
+      POSTGRES_USER: directchannel
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD em infra/.env}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U directchannel -d directchannel"]
+      interval: 5s
+      timeout: 5s
+      retries: 15
+
+volumes:
+  db_data:
