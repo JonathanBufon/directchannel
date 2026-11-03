@@ -4,3 +4,5 @@ Thumbs.db
 .vscode/
 *~
 *.swp
+mobile/node_modules/
+mobile/.expo/
