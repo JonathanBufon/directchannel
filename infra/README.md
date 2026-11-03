@@ -13,4 +13,4 @@ cp infra/.env.example infra/.env        # defina DB_PASSWORD
 docker compose -f infra/compose.yaml up -d --build
 ```
 
-Passo a passo completo em [`docs/SETUP.md`](../docs/SETUP.md).
+Ou, na raiz, simplesmente `make dev`. Passo a passo completo em [`docs/SETUP.md`](../docs/SETUP.md).

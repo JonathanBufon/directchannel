@@ -10,6 +10,8 @@
 
 ## Primeira instalação (Linux)
 
+> Atalho: `make dev` executa todos os passos abaixo e `make mobile` inicia o Expo. A API fica em `http://localhost:8010` (`API_PORT` em `infra/.env`).
+
 Requisitos: Docker com Compose V2, Node.js LTS e npm, internet.
 
 ```bash
