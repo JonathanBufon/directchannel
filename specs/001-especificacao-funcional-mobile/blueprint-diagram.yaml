@@ -1,0 +1,266 @@
+# DirectChannel — diagrama do modelo atual no formato Laravel Shift Blueprint.
+# Data: 2026-11-13. Finalidade: visualizacao/revisao, NAO gerar/aplicar migrations.
+# Fontes: spec.md (incluindo as tres rodadas), data-model.md e physical-model.md.
+# Tipos abaixo usam a nomenclatura Laravel/Blueprint, nao DDL PostgreSQL.
+# binary corresponde a bytea; timestampTz:6 representa timestamptz(6).
+# id representa identidade numerica; identity PostgreSQL versus serial exige revisao posterior.
+#
+# User e PersonalAccessToken sao referencias para o diagrama:
+# - users ja existe: NAO recriar a tabela nem substituir seu Model.
+# - personal_access_tokens pertence ao Sanctum: NAO duplicar a migration oficial.
+# As sete outras tabelas tecnicas existentes nao integram este diagrama de dominio.
+#
+# Limitacoes que NAO devem ser interpretadas como regras resolvidas:
+# - UNIQUE global de lower(users.username), incluindo contas desativadas: expressao/collation pendentes.
+# - UNIQUE parcial access_grants(user_id) WHERE revoked_at IS NULL.
+# - UNIQUE parcial conversation_participants(conversation_id,user_id) WHERE left_at IS NULL.
+# - UNIQUE parcial account_blocks(user_id) WHERE unblocked_at IS NULL.
+# - FK composta messages(sender_participant_id,conversation_id) ->
+#   conversation_participants(id,conversation_id); a aresta simples de autoria abaixo e visual.
+# - CHECKs de dominio/periodos, nao sobreposicao, contagem de responsaveis e autorizacao
+#   temporal/transacional nao sao substituidos pelas relacoes representadas no Blueprint.
+# - PKs compostas sao representadas; Models Eloquent convencionais nao as suportam como identidade.
+# - Nao usar belongsToMany: as associacoes ja sao modelos explicitos, sem pivots adicionais.
+# - PublicKeyMaterial permanece parcial/bloqueado em P-07; nao contem chaves privadas.
+# - TemporaryUpload e um nome LOGICO para o novo conceito aprovado; nome e campos fisicos pendentes.
+# - Este arquivo NAO fecha P-01 a P-09 nem aprova as convencoes tecnicas candidatas.
+
+models:
+  User:
+    meta:
+      table: users
+    id: id
+    name: string:255
+    email: string:255 unique
+    password: string:255
+    email_verified_at: timestamp:0 nullable
+    remember_token: string:100 nullable
+    created_at: timestamp:0 nullable
+    updated_at: timestamp:0 nullable
+    timestamps: false
+    # Extensoes propostas; username nullable apenas durante transicao/backfill.
+    username: text nullable
+    is_admin: boolean default:false
+    deleted_at: timestampTz:6 nullable
+    # Unicidade sem distinguir caixa inclui contas desativadas; nao usar unique simples.
+
+  AccessGrant:
+    meta:
+      table: access_grants
+    id: id
+    user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    started_at: timestampTz:6 useCurrent
+    revoked_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - index: user_id, id
+    # No maximo um contexto nao revogado por conta, mas varias credenciais no contexto.
+    # Novo login autorizado substitui o anterior; nao ha renovacao automatica no MVP.
+
+  PersonalAccessToken:
+    meta:
+      table: personal_access_tokens
+    id: id
+    tokenable_type: string:255
+    tokenable_id: bigInteger
+    name: text
+    token: string:64 unique
+    abilities: text nullable
+    last_used_at: timestamp nullable
+    expires_at: timestamp nullable
+    created_at: timestamp nullable
+    updated_at: timestamp nullable
+    timestamps: false
+    indexes:
+      - index: tokenable_type, tokenable_id
+    relationships:
+      morphTo: tokenable
+    # Dono polimorfico: nao declarar FK SQL artificial tokenable_id -> users.id.
+    # Campos/precisao sao referencia do pacote, sujeitos a versao Sanctum ainda nao fixada.
+
+  AccessGrantToken:
+    meta:
+      table: access_grant_tokens
+    id: false
+    personal_access_token_id: id:PersonalAccessToken primary foreign:personal_access_tokens.id onDelete:restrict onUpdate:restrict
+    access_grant_id: id:AccessGrant foreign:access_grants.id onDelete:restrict onUpdate:restrict
+    timestamps: false
+    indexes:
+      - index: access_grant_id
+    # PK compartilhada, sem geracao propria. Dono do token deve coincidir com o do grant.
+
+  Conversation:
+    meta:
+      table: conversations
+    id: id
+    kind: text
+    created_at: timestampTz:6 useCurrent
+    timestamps: false
+    # kind: direct/group. Individual: duas contas distintas, sem unicidade de par aprovada.
+    relationships:
+      hasOne: Group
+
+  ConversationParticipant:
+    meta:
+      table: conversation_participants
+    id: id
+    conversation_id: id:Conversation foreign:conversations.id onDelete:restrict onUpdate:restrict
+    user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    joined_at: timestampTz:6
+    left_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - unique: id, conversation_id
+      - index: user_id, conversation_id, joined_at, id
+      - index: conversation_id, user_id, joined_at, left_at
+    # Reentrada cria outra ocorrencia; nao substituir UNIQUE parcial por UNIQUE global do par.
+
+  Group:
+    meta:
+      table: groups
+    id: id
+    conversation_id: id:Conversation unique foreign:conversations.id onDelete:restrict onUpdate:restrict
+    name: text
+    timestamps: false
+    # Extensao candidata 1:1 de conversa group; nao e outra fonte de mensagens.
+
+  GroupMember:
+    meta:
+      table: group_members
+    id: false
+    participant_id: id:ConversationParticipant primary foreign:conversation_participants.id onDelete:restrict onUpdate:restrict
+    group_id: id:Group foreign:groups.id onDelete:restrict onUpdate:restrict
+    is_responsible: boolean default:false
+    timestamps: false
+    indexes:
+      - index: group_id, participant_id
+    # PK compartilhada, sem geracao propria. Participacao e grupo devem ter a mesma conversa.
+    # Varios responsaveis, sem maximo especifico; grupo ativo mantem pelo menos um ativo.
+    # Saida do ultimo exige sucessor ativo escolhido/confirmado e transferencia atomica.
+
+  Message:
+    meta:
+      table: messages
+    id: id
+    conversation_id: id:Conversation foreign:conversations.id onDelete:restrict onUpdate:restrict
+    # Relacao de autoria para visualizacao; a FK REAL e composta, descrita no cabecalho.
+    sender_participant_id: id:ConversationParticipant
+    encrypted_body: binary
+    accepted_at: timestampTz:6
+    timestamps: false
+    indexes:
+      - index: conversation_id, accepted_at, id
+      - index: sender_participant_id, conversation_id
+    # conversation_id repetido: excecao candidata a 3FN, nao aprovacao de desempenho.
+    # Mensagem so com anexos e permitida: envelope obrigatorio e pelo menos um anexo final.
+    # Texto/descritores sao cifrados; formato e biblioteca continuam P-07.
+
+  MessageReceipt:
+    meta:
+      table: message_receipts
+    id: false
+    message_id: id:Message foreign:messages.id onDelete:restrict onUpdate:restrict
+    recipient_participant_id: id:ConversationParticipant foreign:conversation_participants.id onDelete:restrict onUpdate:restrict
+    delivered_at: timestampTz:6 nullable
+    read_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - primary: message_id, recipient_participant_id
+      - index: recipient_participant_id, message_id
+    # Nao registrar leitura desativada; reconciliacao/ordem/relogio ainda pendentes em P-09.
+
+  TemporaryUpload:
+    # No fisico NAO ha nome de tabela, colunas, PK ou estados fechados para este conceito.
+    # Nome do modelo e aliases de relacoes abaixo sao apenas identificadores do diagrama.
+    # Blueprint infere user_id/conversation_id dessas relacoes; essa inferencia NAO aprova
+    # nomes/tipos/nulabilidade finais. Nao usar este no para gerar migrations.
+    id: false
+    timestamps: false
+    relationships:
+      belongsTo: User, Conversation
+    # Requisito: identidade e referencia privada, dono/contexto autorizado, fase anterior a mensagem.
+    # Arquivo fica no storage privado; temporario indisponivel aos destinatarios.
+    # Ao confirmar envio: coordenar associacao final e tratamento do registro temporario.
+    # Campos, estados, validade, limpeza, limites, idempotencia e falhas ainda pendentes.
+
+  Attachment:
+    meta:
+      table: attachments
+    id: id
+    message_id: id:Message foreign:messages.id onDelete:restrict onUpdate:restrict
+    storage_key: text
+    size_bytes: bigInteger
+    timestamps: false
+    indexes:
+      - index: message_id, id
+    # Apenas anexo FINAL: mensagem obrigatoria. Uma mensagem tem 0..N anexos.
+    # Sem FK adicional de usuario/conversa; derivam da mensagem.
+    # Descritor/integridade E2EE, remocao e limites continuam parciais; nao impor cascata de storage.
+
+  Block:
+    meta:
+      table: blocks
+    id: false
+    blocker_user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    blocked_user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    timestamps: false
+    indexes:
+      - primary: blocker_user_id, blocked_user_id
+      - index: blocked_user_id
+    # Vinculo pessoal direcionado; desbloquear remove o par. Nao implica reciprocidade.
+
+  Report:
+    meta:
+      table: reports
+    id: id
+    reporter_user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    reported_user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    reason: text
+    narrative: text nullable
+    status: "text default:'recebida'"
+    reviewer_user_id: id:User nullable foreign:users.id onDelete:restrict onUpdate:restrict
+    decision: text nullable
+    decided_at: timestampTz:6 nullable
+    created_at: timestampTz:6 useCurrent
+    deleted_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - index: status, created_at, id
+      - index: reporter_user_id, id
+      - index: reported_user_id, id
+      - index: reviewer_user_id
+    # Estados semanticos aprovados: recebida -> concluída; sem estado em análise.
+    # Conclusao exige reviewer_user_id, decision e decided_at juntos.
+    # Decisao final unica/imutavel; sem reabertura, substituicao ou tabela de revisoes.
+    # Arquivamento separado em deleted_at preserva decisao/autoria/instante.
+
+  AccountBlock:
+    meta:
+      table: account_blocks
+    id: id
+    user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    blocked_by_user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    reason: text
+    blocked_at: timestampTz:6 useCurrent
+    unblocked_by_user_id: id:User nullable foreign:users.id onDelete:restrict onUpdate:restrict
+    unblocked_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - index: user_id, blocked_at, id
+      - index: blocked_by_user_id
+      - index: unblocked_by_user_id
+    # Bloqueio impede apenas NOVOS logins. Nao revoga credenciais/contextos anteriores.
+    # Desbloqueio: autoria/instante conjuntos; estado vigente e a ocorrencia aberta.
+
+  PublicKeyMaterial:
+    meta:
+      table: public_key_material
+    id: id
+    user_id: id:User foreign:users.id onDelete:restrict onUpdate:restrict
+    public_payload: binary
+    published_at: timestampTz:6 useCurrent
+    timestamps: false
+    indexes:
+      - index: user_id, published_at, id
+    # Posicao conceitual minima; biblioteca/protocolo/versionamento/prekeys nao escolhidos.
+    # Nao e um esquema criptografico completo. Nenhuma chave privada no servidor.
