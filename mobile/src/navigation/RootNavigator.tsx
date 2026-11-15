@@ -4,6 +4,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { LoginScreen } from '../screens/auth/LoginScreen';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
+import { RegisterScreen } from '../screens/auth/RegisterScreen';
+import { RecoverAccessScreen } from '../screens/auth/RecoverAccessScreen';
+import { MainTabNavigator } from './MainTabNavigator';
+import { SearchUsersScreen } from '../screens/messages/SearchUsersScreen';
 import { colors } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -25,12 +29,24 @@ export const RootNavigator: React.FC = () => {
         options={{ headerShown: false }}
       />
       <Stack.Screen
+        name="Register"
+        component={RegisterScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="RecoverAccess"
+        component={RecoverAccessScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
         name="Main"
-        component={ProfileScreen}
-        options={{
-          title: 'DirectChannel - Perfil e Recursos',
-          headerBackVisible: false, // Evita voltar ao Login pelo header após autenticar
-        }}
+        component={MainTabNavigator}
+        options={{ headerShown: false }} // Oculta o header da stack raiz
+      />
+      <Stack.Screen
+        name="SearchUsers"
+        component={SearchUsersScreen}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

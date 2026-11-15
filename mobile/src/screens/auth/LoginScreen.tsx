@@ -78,8 +78,8 @@ export const LoginScreen: React.FC = () => {
         onSubmit={handleLoginSubmit}
         isLoading={isLoading}
         errorMessage={apiError}
-        onForgotPassword={() => Alert.alert('Navegação', 'T03 - Recuperar acesso')}
-        onCreateAccount={() => Alert.alert('Navegação', 'T02 - Criar conta')}
+        onForgotPassword={() => navigation.navigate('RecoverAccess')}
+        onCreateAccount={() => navigation.navigate('Register')}
       />
     </CenteredTemplate>
   );

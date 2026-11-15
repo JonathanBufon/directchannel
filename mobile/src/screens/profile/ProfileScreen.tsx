@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootNavigationProp } from '../../types/navigation';
+import { ScreenTemplate } from '../../components/templates/ScreenTemplate';
 import { Label } from '../../components/atoms/Label';
 import { Button } from '../../components/atoms/Button';
 import { colors, spacing, radii } from '../../theme';
@@ -114,8 +115,8 @@ export const ProfileScreen: React.FC = () => {
     navigation.replace('Login');
   };
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
+return (
+    <ScreenTemplate title="Seu perfil" subtitle="Gerenciamento de conta e dispositivos">
       {/* Bloco de Perfil e Avatar */}
       <View style={styles.card}>
         <View style={styles.avatarContainer}>
@@ -130,11 +131,12 @@ export const ProfileScreen: React.FC = () => {
           )}
         </View>
 
-        <Label variant="title" style={styles.userName}>{user?.name ?? 'Usuário'}</Label>
+        <Label variant="title" style={styles.userName}>
+          {user?.name ?? 'Usuário'}
+        </Label>
         <Label variant="caption">{user?.username ?? '@identificador'}</Label>
         <Label variant="caption">{user?.email ?? 'email@exemplo.com'}</Label>
 
-        {/* Botões de Ação para Câmera / Galeria */}
         <View style={styles.buttonRow}>
           <Button
             title="Tirar Foto"
@@ -153,14 +155,16 @@ export const ProfileScreen: React.FC = () => {
         </View>
       </View>
 
-      {/* Bloco de Persistência Segura (Demonstração do Cofre) */}
+      {/* Bloco de Persistência Segura */}
       <View style={styles.card}>
         <Label variant="subtitle" style={styles.sectionTitle}>
           Cofre Seguro (SecureStore)
         </Label>
         <Label variant="caption">Token JWT autenticado em memória segura:</Label>
         <View style={styles.tokenBox}>
-          <Label variant="caption" style={styles.tokenText}>{tokenPreview}</Label>
+          <Label variant="caption" style={styles.tokenText}>
+            {tokenPreview}
+          </Label>
         </View>
       </View>
 
@@ -200,15 +204,11 @@ export const ProfileScreen: React.FC = () => {
         onPress={handleLogout}
         style={styles.logoutButton}
       />
-    </ScrollView>
+    </ScreenTemplate>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: spacing.lg,
-    backgroundColor: colors.background,
-  },
   card: {
     backgroundColor: colors.surface,
     padding: spacing.lg,

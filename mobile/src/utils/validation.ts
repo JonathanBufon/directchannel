@@ -93,3 +93,25 @@ export function getFirstError(errorMap: Record<string, string | null>): string |
   const errors = Object.values(errorMap);
   return errors.find((error): error is string => Boolean(error)) ?? null;
 }
+
+/**
+ * Valida o identificador único (username).
+ * Exige que inicie com '@' e não contenha espaços.
+ */
+export function validateUsername(value: string | undefined | null): string | null {
+  const username = String(value ?? '').trim();
+
+  if (!username) {
+    return 'Informe o identificador.';
+  }
+
+  if (!username.startsWith('@')) {
+    return 'O identificador deve começar com @.';
+  }
+
+  if (/\s/.test(username)) {
+    return 'O identificador não pode conter espaços.';
+  }
+
+  return null;
+}
