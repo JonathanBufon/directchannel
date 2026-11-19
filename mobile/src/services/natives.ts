@@ -2,6 +2,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
+import * as DocumentPicker from 'expo-document-picker';
 import { Platform } from 'react-native';
 
 // Interface para retorno padronizado de coordenadas
@@ -124,5 +125,38 @@ export async function getCurrentCoordinates(): Promise<GeoCoordinates> {
   return {
     latitude: location.coords.latitude,
     longitude: location.coords.longitude,
+  };
+}
+
+// Seletor de documentos
+export interface SelectedDocument {
+  name: string;
+  size?: number; // Tamanho em bytes
+  uri: string;
+  mimeType?: string;
+}
+
+
+/**
+ * Abre o gerenciador de arquivos nativo do aparelho para seleção de documentos.
+ * Retorna os metadados do arquivo ou null caso o usuário cancele.
+ */
+export async function pickDocument(): Promise<SelectedDocument | null> {
+  const result = await DocumentPicker.getDocumentAsync({
+    type: ['application/pdf', 'image/*', 'text/*'],
+    copyToCacheDirectory: true,
+  });
+
+  if (result.canceled || !result.assets || result.assets.length === 0) {
+    return null;
+  }
+
+  const asset = result.assets[0];
+
+  return {
+    name: asset.name,
+    size: asset.size,
+    uri: asset.uri,
+    mimeType: asset.mimeType,
   };
 }

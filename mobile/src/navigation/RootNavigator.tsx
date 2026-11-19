@@ -8,6 +8,10 @@ import { RegisterScreen } from '../screens/auth/RegisterScreen';
 import { RecoverAccessScreen } from '../screens/auth/RecoverAccessScreen';
 import { MainTabNavigator } from './MainTabNavigator';
 import { SearchUsersScreen } from '../screens/messages/SearchUsersScreen';
+import { ChatScreen } from '../screens/conversations/ChatScreen';
+import { FileViewerScreen } from '../screens/files/FileViewerScreen';
+import { ContactInfoScreen } from '../screens/conversations/ContactInfoScreen';
+import { VerifyContactScreen } from '../screens/conversations/VerifyContactScreen';
 import { colors } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,6 +50,26 @@ export const RootNavigator: React.FC = () => {
       <Stack.Screen
         name="SearchUsers"
         component={SearchUsersScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Chat"
+        component={ChatScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="FileViewer"
+        component={FileViewerScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ContactInfo"
+        component={ContactInfoScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="VerifyContact"
+        component={VerifyContactScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

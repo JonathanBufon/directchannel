@@ -32,14 +32,13 @@ export const SearchUsersScreen: React.FC = () => {
     );
   });
 
-  // Callback estável para o renderItem (regra de desempenho da apostila)
   const handleSelectUser = useCallback((user: UserRowData) => {
-    Alert.alert(
-      'Iniciar Conversa',
-      `Usuário selecionado: ${user.name} (${user.username}). O chat seguro T06 será aberto na próxima etapa.`,
-      [{ text: 'OK' }]
-    );
-  }, []);
+    navigation.navigate('Chat', {
+      userId: user.id,
+      name: user.name,
+      username: user.username,
+    });
+  }, [navigation]);
 
   const renderItem = useCallback(
     ({ item }: { item: UserRowData }) => (
