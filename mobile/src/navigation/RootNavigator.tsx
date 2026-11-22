@@ -12,66 +12,96 @@ import { ChatScreen } from '../screens/conversations/ChatScreen';
 import { FileViewerScreen } from '../screens/files/FileViewerScreen';
 import { ContactInfoScreen } from '../screens/conversations/ContactInfoScreen';
 import { VerifyContactScreen } from '../screens/conversations/VerifyContactScreen';
+import { CreateGroupScreen } from '../screens/groups/CreateGroupScreen';
+import { GroupChatScreen } from '../screens/groups/GroupChatScreen';
+import { GroupInfoScreen } from '../screens/groups/GroupInfoScreen';
+import { ManageGroupScreen } from '../screens/groups/ManageGroupScreen';
+import { LeaveGroupScreen } from '../screens/groups/LeaveGroupScreen';
 import { colors } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export const RootNavigator: React.FC = () => {
-  return (
-    <Stack.Navigator
-      id="rootStack"
-      initialRouteName="Login"
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTintColor: colors.primary,
-        contentStyle: { backgroundColor: colors.background },
-      }}
-    >
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Register"
-        component={RegisterScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="RecoverAccess"
-        component={RecoverAccessScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Main"
-        component={MainTabNavigator}
-        options={{ headerShown: false }} // Oculta o header da stack raiz
-      />
-      <Stack.Screen
-        name="SearchUsers"
-        component={SearchUsersScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="FileViewer"
-        component={FileViewerScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ContactInfo"
-        component={ContactInfoScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="VerifyContact"
-        component={VerifyContactScreen}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  );
+    return (
+        <Stack.Navigator
+            id="rootStack"
+            initialRouteName="Login"
+            screenOptions={{
+                headerStyle: { backgroundColor: colors.background },
+                headerTintColor: colors.primary,
+                contentStyle: { backgroundColor: colors.background },
+            }}
+        >
+            <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Register"
+                component={RegisterScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="RecoverAccess"
+                component={RecoverAccessScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Main"
+                component={MainTabNavigator}
+                options={{ headerShown: false }} // Oculta o header da stack raiz
+            />
+            <Stack.Screen
+                name="SearchUsers"
+                component={SearchUsersScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Chat"
+                component={ChatScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="FileViewer"
+                component={FileViewerScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="ContactInfo"
+                component={ContactInfoScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="VerifyContact"
+                component={VerifyContactScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="CreateGroup"
+                component={CreateGroupScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="GroupChat"
+                component={GroupChatScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="GroupInfo"
+                component={GroupInfoScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="ManageGroup"
+                component={ManageGroupScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="LeaveGroup"
+                component={LeaveGroupScreen}
+                options={{ headerShown: false }}
+            />
+        </Stack.Navigator>
+    );
 };

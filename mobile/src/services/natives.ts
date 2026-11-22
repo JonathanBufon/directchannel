@@ -7,58 +7,58 @@ import { Platform } from 'react-native';
 
 // Interface para retorno padronizado de coordenadas
 export interface GeoCoordinates {
-  latitude: number;
-  longitude: number;
+    latitude: number;
+    longitude: number;
 }
 
 
 // Configura o comportamento das notificações quando o app está aberto em primeiro plano.
 export function setupNotificationHandler(): void {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+            shouldShowBanner: true,
+            shouldShowList: true,
+            shouldPlaySound: true,
+            shouldSetBadge: false,
+        }),
+    });
 }
 
 // Solicita permissão para emissão de notificações
 export async function requestNotificationPermission(): Promise<boolean> {
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
 
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
+    if (existingStatus !== 'granted') {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+    }
 
-  return finalStatus === 'granted';
+    return finalStatus === 'granted';
 }
 
 // Dispara uma notificação local agendada.
 export async function sendLocalNotification(
-  title: string,
-  body: string,
-  delayInSeconds: number = 2
+    title: string,
+    body: string,
+    delayInSeconds: number = 2
 ): Promise<void> {
-  const hasPermission = await requestNotificationPermission();
-  if (!hasPermission) {
-    throw new Error('Permissão de notificações não concedida pelo usuário.');
-  }
+    const hasPermission = await requestNotificationPermission();
+    if (!hasPermission) {
+        throw new Error('Permissão de notificações não concedida pelo usuário.');
+    }
 
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title,
-      body,
-      sound: true,
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds: delayInSeconds,
-    },
-  });
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title,
+            body,
+            sound: true,
+        },
+        trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+            seconds: delayInSeconds,
+        },
+    });
 }
 
 
@@ -67,23 +67,23 @@ export async function sendLocalNotification(
  * Retorna o URI local da imagem capturada ou null se o usuário cancelar.
  */
 export async function capturePhoto(): Promise<string | null> {
-  // Solicita permissão em tempo de execução
-  const permission = await ImagePicker.requestCameraPermissionsAsync();
-  if (!permission.granted) {
-    throw new Error('Permissão de acesso à câmera negada.');
-  }
+    // Solicita permissão em tempo de execução
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    if (!permission.granted) {
+        throw new Error('Permissão de acesso à câmera negada.');
+    }
 
-  const result = await ImagePicker.launchCameraAsync({
-    allowsEditing: true,
-    aspect: [1, 1], // Quadrado para avatar/perfil
-    quality: 0.8,
-  });
+    const result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [1, 1], // Quadrado para avatar/perfil
+        quality: 0.8,
+    });
 
-  if (result.canceled || !result.assets || result.assets.length === 0) {
-    return null;
-  }
+    if (result.canceled || !result.assets || result.assets.length === 0) {
+        return null;
+    }
 
-  return result.assets[0].uri;
+    return result.assets[0].uri;
 }
 
 /**
@@ -91,49 +91,49 @@ export async function capturePhoto(): Promise<string | null> {
  * Retorna o URI da imagem selecionada ou null se cancelar.
  */
 export async function pickImageFromGallery(): Promise<string | null> {
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) {
-    throw new Error('Permissão de acesso à galeria negada.');
-  }
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+        throw new Error('Permissão de acesso à galeria negada.');
+    }
 
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    allowsEditing: true,
-    aspect: [1, 1],
-    quality: 0.8,
-  });
+    const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+    });
 
-  if (result.canceled || !result.assets || result.assets.length === 0) {
-    return null;
-  }
+    if (result.canceled || !result.assets || result.assets.length === 0) {
+        return null;
+    }
 
-  return result.assets[0].uri;
+    return result.assets[0].uri;
 }
 
 // Solicita permissão e obtém as coordenadas geográficas atuais do aparelho.
 export async function getCurrentCoordinates(): Promise<GeoCoordinates> {
-  // Solicita permissão apenas enquanto o app estiver em uso (regra da seção 8 do material)
-  const { status } = await Location.requestForegroundPermissionsAsync();
-  if (status !== 'granted') {
-    throw new Error('Permissão de localização negada.');
-  }
+    // Solicita permissão apenas enquanto o app estiver em uso (regra da seção 8 do material)
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+        throw new Error('Permissão de localização negada.');
+    }
 
-  const location = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.Balanced,
-  });
+    const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+    });
 
-  return {
-    latitude: location.coords.latitude,
-    longitude: location.coords.longitude,
-  };
+    return {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+    };
 }
 
 // Seletor de documentos
 export interface SelectedDocument {
-  name: string;
-  size?: number; // Tamanho em bytes
-  uri: string;
-  mimeType?: string;
+    name: string;
+    size?: number; // Tamanho em bytes
+    uri: string;
+    mimeType?: string;
 }
 
 
@@ -142,21 +142,21 @@ export interface SelectedDocument {
  * Retorna os metadados do arquivo ou null caso o usuário cancele.
  */
 export async function pickDocument(): Promise<SelectedDocument | null> {
-  const result = await DocumentPicker.getDocumentAsync({
-    type: ['application/pdf', 'image/*', 'text/*'],
-    copyToCacheDirectory: true,
-  });
+    const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/*', 'text/*'],
+        copyToCacheDirectory: true,
+    });
 
-  if (result.canceled || !result.assets || result.assets.length === 0) {
-    return null;
-  }
+    if (result.canceled || !result.assets || result.assets.length === 0) {
+        return null;
+    }
 
-  const asset = result.assets[0];
+    const asset = result.assets[0];
 
-  return {
-    name: asset.name,
-    size: asset.size,
-    uri: asset.uri,
-    mimeType: asset.mimeType,
-  };
+    return {
+        name: asset.name,
+        size: asset.size,
+        uri: asset.uri,
+        mimeType: asset.mimeType,
+    };
 }

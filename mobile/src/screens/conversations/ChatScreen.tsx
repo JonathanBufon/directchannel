@@ -111,16 +111,16 @@ export const ChatScreen: React.FC = () => {
 
                 <Pressable
                     onPress={() =>
-                    navigation.navigate('ContactInfo', {
-                        userId,
-                        name,
-                        username,
-                    })
+                        navigation.navigate('ContactInfo', {
+                            userId,
+                            name,
+                            username,
+                        })
                     }
                     style={styles.headerAction}
                 >
                     <Label variant="caption" style={styles.headerActionText}>
-                    Info ›
+                        Info ›
                     </Label>
                 </Pressable>
             </View>
@@ -134,16 +134,16 @@ export const ChatScreen: React.FC = () => {
 
             <Pressable
                 onPress={() =>
-                navigation.navigate('VerifyContact', {
-                    userId,
-                    name,
-                    username,
-                })
+                    navigation.navigate('VerifyContact', {
+                        userId,
+                        name,
+                        username,
+                    })
                 }
                 style={styles.verifyRow}
             >
                 <Label variant="caption" style={styles.verifyText}>
-                Verificar código de segurança deste contato ›
+                    Verificar código de segurança deste contato ›
                 </Label>
             </Pressable>
 

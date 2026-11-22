@@ -15,6 +15,7 @@ export interface ChatMessage {
     text?: string;
     isMine: boolean;
     time: string;
+    authorName?: string;
     attachment?: MessageAttachment;
 }
 
@@ -24,11 +25,17 @@ export interface MessageBubbleProps {
 }
 
 export const MessageBubble = memo<MessageBubbleProps>(({ message, onOpenAttachment }) => {
-    const { isMine, text, time, attachment } = message;
+    const { isMine, text, time, authorName, attachment } = message;
 
     return (
         <View style={[styles.wrapper, isMine ? styles.wrapperMine : styles.wrapperTheir]}>
             <View style={[styles.bubble, isMine ? styles.bubbleMine : styles.bubbleTheir]}>
+                {/* Nome do autor da mensagem em grupos (apenas para mensagens recebidas) */}
+                {!isMine && authorName ? (
+                    <Label variant="caption" style={styles.authorLabel}>
+                        {authorName}
+                    </Label>
+                ) : null}
                 {/* Renderiza arquivo anexo se existir */}
                 {attachment ? (
                     <View style={styles.attachmentContainer}>
@@ -113,6 +120,12 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.border,
         borderBottomLeftRadius: radii.xs,
+    },
+    authorLabel: {
+        fontWeight: '700',
+        color: colors.primary,
+        marginBottom: 2,
+        fontSize: 12,
     },
     messageText: {
         lineHeight: 22,
