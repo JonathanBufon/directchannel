@@ -50,6 +50,9 @@ export type RootStackParamList = {
         groupId: string;
         groupName: string;
     };
+    EditProfile: undefined;
+    Privacy: undefined;
+    BlockedContacts: undefined;
 };
 
 export type MainTabParamList = {

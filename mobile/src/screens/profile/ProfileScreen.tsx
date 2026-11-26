@@ -1,285 +1,201 @@
-// mobile/src/screens/ProfileScreen.tsx
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Image, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+// mobile/src/screens/profile/ProfileScreen.tsx
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet, Pressable, Image, Alert } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { RootNavigationProp } from '../../types/navigation';
 import { ScreenTemplate } from '../../components/templates/ScreenTemplate';
 import { Label } from '../../components/atoms/Label';
-import { Button } from '../../components/atoms/Button';
-import { colors, spacing, radii } from '../../theme';
-import {
-    getAuthToken,
-    getUserProfile,
-    saveUserProfile,
-    clearUserSession,
-    UserProfile,
-} from '../../services/storage';
-import {
-    capturePhoto,
-    pickImageFromGallery,
-    getCurrentCoordinates,
-    sendLocalNotification,
-    GeoCoordinates,
-} from '../../services/natives';
+import { colors, spacing, radii, dimensions } from '../../theme';
+import { getUserProfile, clearUserSession, UserProfile } from '../../services/storage';
 
 export const ProfileScreen: React.FC = () => {
-    const navigation = useNavigation<RootNavigationProp>();
+  const navigation = useNavigation<RootNavigationProp>();
+  const [user, setUser] = useState<UserProfile | null>(null);
 
-    // Estados locais da tela
-    const [user, setUser] = useState<UserProfile | null>(null);
-    const [tokenPreview, setTokenPreview] = useState<string>('Carregando...');
-    const [coordinates, setCoordinates] = useState<GeoCoordinates | null>(null);
-    const [isLoadingGps, setIsLoadingGps] = useState(false);
-    const [isLoadingPhoto, setIsLoadingPhoto] = useState(false);
-
-    // Carrega dados da gaveta segura (Cofre) e do AsyncStorage ao montar
-    useEffect(() => {
-        async function loadStoredData() {
-            const token = await getAuthToken();
-            setTokenPreview(token ? `${token.substring(0, 15)}... (Protegido no Cofre)` : 'Nenhum token encontrado');
-
-            const profile = await getUserProfile();
-            if (profile) {
-                setUser(profile);
-            }
+  // Recarrega os dados do AsyncStorage sempre que a tela ganha foco
+  useFocusEffect(
+    useCallback(() => {
+      async function loadProfile() {
+        const storedProfile = await getUserProfile();
+        if (storedProfile) {
+          setUser(storedProfile);
         }
+      }
+      loadProfile();
+    }, [])
+  );
 
-        loadStoredData();
-    }, []);
+  const handleLogout = async () => {
+    Alert.alert('Sair da conta', 'Deseja realmente encerrar sua sessão neste aparelho?', [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Sair',
+        style: 'destructive',
+        onPress: async () => {
+          await clearUserSession();
+          navigation.replace('Login');
+        },
+      },
+    ]);
+  };
 
-    // 1. Recurso Nativo: Câmera
-    const handleTakePhoto = async () => {
-        try {
-            setIsLoadingPhoto(true);
-            const uri = await capturePhoto();
-            if (uri && user) {
-                const updatedProfile = { ...user, avatarUri: uri };
-                setUser(updatedProfile);
-                await saveUserProfile(updatedProfile); // Persiste a URI no AsyncStorage
-            }
-        } catch (error) {
-            Alert.alert('Erro na Câmera', (error as Error).message);
-        } finally {
-            setIsLoadingPhoto(false);
-        }
-    };
+  const initial = user?.name ? user.name.slice(0, 2).toUpperCase() : 'SP';
 
-    // 2. Recurso Nativo: Galeria
-    const handlePickGallery = async () => {
-        try {
-            setIsLoadingPhoto(true);
-            const uri = await pickImageFromGallery();
-            if (uri && user) {
-                const updatedProfile = { ...user, avatarUri: uri };
-                setUser(updatedProfile);
-                await saveUserProfile(updatedProfile);
-            }
-        } catch (error) {
-            Alert.alert('Erro na Galeria', (error as Error).message);
-        } finally {
-            setIsLoadingPhoto(false);
-        }
-    };
+  return (
+    <ScreenTemplate scrollable>
+      {/* Título Principal */}
+      <View style={styles.header}>
+        <Label variant="title" style={styles.headerTitle}>
+          Perfil
+        </Label>
+      </View>
 
-    // 3. Recurso Nativo: GPS / Geolocalização
-    const handleGetLocation = async () => {
-        try {
-            setIsLoadingGps(true);
-            const coords = await getCurrentCoordinates();
-            setCoordinates(coords);
-        } catch (error) {
-            Alert.alert('Erro de Localização', (error as Error).message);
-        } finally {
-            setIsLoadingGps(false);
-        }
-    };
+      {/* Card Principal do Usuário (Sem exibir e-mail conforme RF03/RF04) */}
+      <View style={styles.profileSummary}>
+        <View style={styles.avatar}>
+          {user?.avatarUri ? (
+            <Image source={{ uri: user.avatarUri }} style={styles.avatarImage} />
+          ) : (
+            <Label variant="title" style={styles.avatarText}>
+              {initial}
+            </Label>
+          )}
+        </View>
 
-    // 4. Recurso Nativo: Notificação Local
-    const handleSendNotification = async () => {
-        try {
-            await sendLocalNotification(
-                'DirectChannel: Alerta de Segurança',
-                'Seu dispositivo foi verificado e as chaves estão ativas.',
-                2
-            );
-            Alert.alert('Notificação Agendada', 'O aviso chegará em 2 segundos.');
-        } catch (error) {
-            Alert.alert('Erro na Notificação', (error as Error).message);
-        }
-    };
+        <Label variant="title" style={styles.name}>
+          {user?.name ?? 'Seu perfil'}
+        </Label>
+        <Label variant="caption" style={styles.username}>
+          {user?.username ?? '@seuusuario'}
+        </Label>
+      </View>
 
-    // 5. Logout Seguro (Limpeza de Cofre e Reset)
-    const handleLogout = async () => {
-        await clearUserSession();
-        // navigation.replace garante que a tela interna saia da pilha de navegação
-        navigation.replace('Login');
-    };
+      {/* Lista de Opções Institucionais (Wireframe T16) */}
+      <View style={styles.menuCard}>
+        {/* 1. Editar Perfil (T17) */}
+        <Pressable
+          style={styles.menuRow}
+          onPress={() => navigation.navigate('EditProfile')}
+        >
+          <Label variant="body" style={styles.menuText}>
+            Editar perfil
+          </Label>
+          <Label variant="title" style={styles.chevron}>
+            ›
+          </Label>
+        </Pressable>
+        {/* 2. Privacidade (T18) */}   
+        <Pressable
+            style={styles.menuRow}
+            onPress={() => navigation.navigate('Privacy')}
+        >
+            <Label variant="body" style={styles.menuText}>
+                Privacidade
+            </Label>
+            <Label variant="title" style={styles.chevron}>
+                ›
+            </Label>
+        </Pressable>
+        {/* 3. Contatos Bloqueados (T19) */}
+        <Pressable
+            style={styles.menuRow}
+            onPress={() => navigation.navigate('BlockedContacts')}
+        >
+            <Label variant="body" style={styles.menuText}>
+                Contatos bloqueados
+            </Label>
+            <Label variant="title" style={styles.chevron}>
+                ›
+            </Label>
+        </Pressable>
 
-    return (
-        <ScreenTemplate title="Seu perfil" subtitle="Gerenciamento de conta e dispositivos">
-            {/* Bloco de Perfil e Avatar */}
-            <View style={styles.card}>
-                <View style={styles.avatarContainer}>
-                    {user?.avatarUri ? (
-                        <Image source={{ uri: user.avatarUri }} style={styles.avatarImage} />
-                    ) : (
-                        <View style={styles.avatarPlaceholder}>
-                            <Label variant="title" style={styles.avatarText}>
-                                {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-                            </Label>
-                        </View>
-                    )}
-                </View>
-
-                <Label variant="title" style={styles.userName}>
-                    {user?.name ?? 'Usuário'}
-                </Label>
-                <Label variant="caption">{user?.username ?? '@identificador'}</Label>
-                <Label variant="caption">{user?.email ?? 'email@exemplo.com'}</Label>
-
-                <View style={styles.buttonRow}>
-                    <Button
-                        title="Tirar Foto"
-                        variant="secondary"
-                        isLoading={isLoadingPhoto}
-                        onPress={handleTakePhoto}
-                        style={styles.halfButton}
-                    />
-                    <Button
-                        title="Galeria"
-                        variant="secondary"
-                        isLoading={isLoadingPhoto}
-                        onPress={handlePickGallery}
-                        style={styles.halfButton}
-                    />
-                </View>
-            </View>
-
-            {/* Bloco de Persistência Segura */}
-            <View style={styles.card}>
-                <Label variant="subtitle" style={styles.sectionTitle}>
-                    Cofre Seguro (SecureStore)
-                </Label>
-                <Label variant="caption">Token JWT autenticado em memória segura:</Label>
-                <View style={styles.tokenBox}>
-                    <Label variant="caption" style={styles.tokenText}>
-                        {tokenPreview}
-                    </Label>
-                </View>
-            </View>
-
-            {/* Bloco de Recursos Nativos: GPS e Notificação */}
-            <View style={styles.card}>
-                <Label variant="subtitle" style={styles.sectionTitle}>
-                    Hardware e Permissões
-                </Label>
-
-                <Button
-                    title={isLoadingGps ? 'Obtendo GPS...' : 'Obter Posição GPS'}
-                    variant="secondary"
-                    isLoading={isLoadingGps}
-                    onPress={handleGetLocation}
-                    style={styles.actionButton}
-                />
-
-                {coordinates ? (
-                    <View style={styles.gpsResult}>
-                        <Label variant="body">Lat: {coordinates.latitude.toFixed(6)}</Label>
-                        <Label variant="body">Long: {coordinates.longitude.toFixed(6)}</Label>
-                    </View>
-                ) : null}
-
-                <Button
-                    title="Disparar Notificação Local"
-                    variant="secondary"
-                    onPress={handleSendNotification}
-                    style={styles.actionButton}
-                />
-            </View>
-
-            {/* Logout Atômico */}
-            <Button
-                title="Encerrar Sessão (Logout)"
-                variant="danger"
-                onPress={handleLogout}
-                style={styles.logoutButton}
-            />
-        </ScreenTemplate>
-    );
+        {/* 4. Sair da Conta (Logout Atômico) */}
+        <Pressable style={[styles.menuRow, styles.lastRow]} onPress={handleLogout}>
+          <Label variant="body" style={styles.logoutText}>
+            Sair da conta
+          </Label>
+          <Label variant="title" style={styles.logoutChevron}>
+            ›
+          </Label>
+        </Pressable>
+      </View>
+    </ScreenTemplate>
+  );
 };
 
 const styles = StyleSheet.create({
-    card: {
-        backgroundColor: colors.surface,
-        padding: spacing.lg,
-        borderRadius: radii.md,
-        borderWidth: 1,
-        borderColor: colors.border,
-        marginBottom: spacing.md,
-        alignItems: 'center',
-    },
-    avatarContainer: {
-        marginBottom: spacing.md,
-    },
-    avatarImage: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
-    },
-    avatarPlaceholder: {
-        width: 90,
-        height: 90,
-        borderRadius: 45,
-        backgroundColor: colors.protection,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    avatarText: {
-        color: colors.primary,
-        fontSize: 32,
-        fontWeight: '700',
-    },
-    userName: {
-        marginBottom: spacing.xs,
-    },
-    buttonRow: {
-        flexDirection: 'row',
-        marginTop: spacing.md,
-        gap: spacing.sm,
-        width: '100%',
-    },
-    halfButton: {
-        flex: 1,
-    },
-    sectionTitle: {
-        marginBottom: spacing.sm,
-        alignSelf: 'flex-start',
-    },
-    tokenBox: {
-        backgroundColor: colors.protection,
-        padding: spacing.sm,
-        borderRadius: radii.sm,
-        marginTop: spacing.xs,
-        width: '100%',
-    },
-    tokenText: {
-        color: colors.primary,
-        fontWeight: '600',
-    },
-    actionButton: {
-        width: '100%',
-        marginBottom: spacing.sm,
-    },
-    gpsResult: {
-        backgroundColor: colors.background,
-        padding: spacing.sm,
-        borderRadius: radii.sm,
-        width: '100%',
-        marginBottom: spacing.sm,
-        alignItems: 'center',
-    },
-    logoutButton: {
-        marginTop: spacing.md,
-        marginBottom: spacing.xl,
-    },
+  header: {
+    marginBottom: spacing.lg,
+  },
+  headerTitle: {
+    fontWeight: '700',
+    color: colors.text,
+  },
+  profileSummary: {
+    alignItems: 'center',
+    marginBottom: spacing.xl,
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.protection,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarText: {
+    fontSize: 28,
+    color: colors.primary,
+    fontWeight: '700',
+  },
+  name: {
+    fontWeight: '700',
+    color: colors.text,
+  },
+  username: {
+    color: colors.textSecondary,
+    marginTop: spacing.xs,
+  },
+  menuCard: {
+    backgroundColor: colors.surface,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  menuRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    minHeight: dimensions.minTouchArea,
+  },
+  lastRow: {
+    borderBottomWidth: 0,
+  },
+  menuText: {
+    fontWeight: '500',
+    color: colors.text,
+  },
+  chevron: {
+    color: colors.textSecondary,
+    fontSize: 22,
+  },
+  logoutText: {
+    fontWeight: '600',
+    color: colors.error,
+  },
+  logoutChevron: {
+    color: colors.error,
+    fontSize: 22,
+  },
 });

@@ -17,6 +17,9 @@ import { GroupChatScreen } from '../screens/groups/GroupChatScreen';
 import { GroupInfoScreen } from '../screens/groups/GroupInfoScreen';
 import { ManageGroupScreen } from '../screens/groups/ManageGroupScreen';
 import { LeaveGroupScreen } from '../screens/groups/LeaveGroupScreen';
+import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
+import { PrivacyScreen } from '../screens/profile/PrivacyScreen';
+import { BlockedContactsScreen } from '../screens/profile/BlockedContactsScreen';
 import { colors } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -100,6 +103,21 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen
                 name="LeaveGroup"
                 component={LeaveGroupScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="EditProfile"
+                component={EditProfileScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="Privacy"
+                component={PrivacyScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="BlockedContacts"
+                component={BlockedContactsScreen}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>
