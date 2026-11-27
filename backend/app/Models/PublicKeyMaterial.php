@@ -1,56 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Casts\Binary;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PublicKeyMaterial extends Model
+final class PublicKeyMaterial extends Model
 {
     use HasFactory;
 
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table = 'public_key_material';
-
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'user_id',
-        'public_payload',
-        'published_at',
-    ];
+    protected $table = 'public_key_material';
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $fillable = ['user_id', 'public_payload', 'published_at'];
+
+    protected $hidden = ['public_payload'];
+
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
+            'published_at' => 'immutable_datetime',
             'user_id' => 'integer',
-            'published_at' => 'timestamp',
+            'public_payload' => Binary::class,
         ];
     }
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

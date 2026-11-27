@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,15 +13,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::disableForeignKeyConstraints();
-
         Schema::create('access_grant_tokens', function (Blueprint $table) {
-            $table->foreignId('personal_access_token_id')->constrained()->onDelete('restrict');
-            $table->foreignId('access_grant_id')->constrained()->onDelete('restrict');
+            $table->foreignId('personal_access_token_id')->constrained()->cascadeOnDelete()->onUpdate('restrict');
+            $table->foreignId('access_grant_id')->constrained()->onDelete('restrict')->onUpdate('restrict');
             $table->index('access_grant_id');
+            $table->primary('personal_access_token_id');
         });
-
-        Schema::enableForeignKeyConstraints();
     }
 
     /**

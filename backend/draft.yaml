@@ -5,7 +5,9 @@
 #   - PersonalAccessToken: migration oficial do Sanctum.
 #   - TemporaryUpload: migration/model próprios (temporary_uploads).
 # Constraints que o Blueprint não gera (UNIQUE parciais, FK composta, PKs compostas,
-# CHECKs) ficam numa migration dedicada: *_add_domain_constraints.php.
+# CHECKs) são revisadas à mão nas migrations; UNIQUEs parciais, FK composta e CHECKs
+# ficam em *_add_domain_constraints.php. PKs são corrigidas nas migrations de criação.
+# reports.status persiste recebida/concluida; o rótulo concluída pertence à API.
 
 models:
   AccessGrant:

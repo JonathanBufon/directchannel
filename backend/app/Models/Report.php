@@ -1,68 +1,59 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
+use App\Enums\ReportStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Report extends Model
+final class Report extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'reporter_user_id',
-        'reported_user_id',
-        'reason',
-        'narrative',
-        'status',
-        'reviewer_user_id',
-        'decision',
-        'decided_at',
-    ];
+    protected $fillable = ['reporter_user_id', 'reported_user_id', 'reason', 'narrative', 'status', 'reviewer_user_id', 'decision', 'decided_at', 'created_at', 'deleted_at'];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'id' => 'integer',
+            'decided_at' => 'immutable_datetime',
+            'created_at' => 'immutable_datetime',
+            'deleted_at' => 'immutable_datetime',
             'reporter_user_id' => 'integer',
             'reported_user_id' => 'integer',
             'reviewer_user_id' => 'integer',
-            'decided_at' => 'timestamp',
-            'created_at' => 'timestamp',
-            'deleted_at' => 'timestamp',
+            'status' => ReportStatus::class,
         ];
     }
 
-    public function reporterUser(): BelongsTo
+    public function reporter(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'reporter_user_id');
     }
 
-    public function reportedUser(): BelongsTo
+    public function reported(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'reported_user_id');
     }
 
-    public function reviewerUser(): BelongsTo
+    public function reviewer(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'reviewer_user_id');
+    }
+
+    public function scopeReceived(Builder $query): Builder
+    {
+        return $query->where('status', ReportStatus::Received);
+    }
+
+    public function isReceived(): bool
+    {
+        return $this->status === ReportStatus::Received;
     }
 }

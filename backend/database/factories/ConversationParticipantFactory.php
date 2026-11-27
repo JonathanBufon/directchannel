@@ -1,23 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\Conversation;
+use App\Models\ConversationParticipant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ConversationParticipantFactory extends Factory
+/** @extends Factory<ConversationParticipant> */
+final class ConversationParticipantFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
         return [
             'conversation_id' => Conversation::factory(),
             'user_id' => User::factory(),
-            'joined_at' => fake()->dateTime(),
-            'left_at' => fake()->dateTime(),
+            'joined_at' => now(),
+            'left_at' => null,
         ];
+    }
+
+    public function left(): static
+    {
+        return $this->state(fn (): array => ['joined_at' => now()->subDay(), 'left_at' => now()]);
     }
 }

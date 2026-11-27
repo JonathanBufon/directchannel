@@ -1,21 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\AccessGrant;
-use App\Models\PersonalAccessToken;
+use App\Models\AccessGrantToken;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class AccessGrantTokenFactory extends Factory
+/** @extends Factory<AccessGrantToken> */
+final class AccessGrantTokenFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
         return [
-            'personal_access_token_id' => PersonalAccessToken::factory(),
             'access_grant_id' => AccessGrant::factory(),
+            'personal_access_token_id' => fn (array $attributes): int => AccessGrant::findOrFail($attributes['access_grant_id'])->user->createToken('factory')->accessToken->getKey(),
         ];
     }
 }

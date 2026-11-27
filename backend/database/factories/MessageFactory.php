@@ -1,23 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
-use App\Models\Conversation;
 use App\Models\ConversationParticipant;
+use App\Models\Message;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class MessageFactory extends Factory
+/** @extends Factory<Message> */
+final class MessageFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     */
     public function definition(): array
     {
         return [
-            'conversation_id' => Conversation::factory(),
             'sender_participant_id' => ConversationParticipant::factory(),
-            'encrypted_body' => fake()->sha256(),
-            'accepted_at' => fake()->dateTime(),
+            'conversation_id' => fn (array $attributes): int => ConversationParticipant::findOrFail($attributes['sender_participant_id'])->conversation_id,
+            'encrypted_body' => random_bytes(64),
+            'accepted_at' => now(),
         ];
     }
 }

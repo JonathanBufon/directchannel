@@ -1,38 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class GroupMember extends Model
+final class GroupMember extends Model
 {
     use HasFactory;
 
-    /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
     public $timestamps = false;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'participant_id',
-        'group_id',
-        'is_responsible',
-    ];
+    public $incrementing = false;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $primaryKey = 'participant_id';
+
+    protected $fillable = ['participant_id', 'group_id', 'is_responsible'];
+
     protected function casts(): array
     {
         return [
@@ -44,11 +31,11 @@ class GroupMember extends Model
 
     public function participant(): BelongsTo
     {
-        return $this->belongsTo(ConversationParticipant::class);
+        return $this->belongsTo(ConversationParticipant::class, 'participant_id');
     }
 
     public function group(): BelongsTo
     {
-        return $this->belongsTo(Group::class);
+        return $this->belongsTo(Group::class, 'group_id');
     }
 }
