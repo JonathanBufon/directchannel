@@ -1,0 +1,3034 @@
+{
+  "info": {
+    "name": "DirectChannel",
+    "description": "API DirectChannel. Leia docs/postman/README.md. Execute a collection completa a partir de Registrar usuário A; scripts encadeiam o cenário entre módulos e terminam no logout. Senha, desativação e Admin são executados separadamente. Selecione o mesmo arquivo local nos dois uploads. Dados base64 são envelopes ilustrativos; em produção a cifra ocorre no cliente.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8020/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "otherUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "conversationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "groupId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "messageId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "uploadId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "attachmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "reportId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "emailA",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "emailB",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "usernameA",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "usernameB",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "otherToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "keyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "otherKeyId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "blockedUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "accountBlockId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "resetCode",
+      "value": "123456",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "id": "58a01f8e-6e2d-51aa-9f6b-35a3b12d33cf",
+          "name": "Registrar usuário A",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/register",
+            "description": "Registrar usuário A.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário A Postman\",\n  \"email\": \"{{emailA}}\",\n  \"username\": \"{{usernameA}}\",\n  \"password\": \"Postman-local-123!\",\n  \"password_confirmation\": \"Postman-local-123!\",\n  \"device_name\": \"Postman A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const stamp = pm.variables.replaceIn(\"{{$timestamp}}\");",
+                  "pm.collectionVariables.set(\"emailA\", \"postman_a_\" + stamp + \"@example.com\");",
+                  "pm.collectionVariables.set(\"usernameA\", \"pm_a_\" + stamp);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"userId\", data.user.id);",
+                  "    pm.collectionVariables.set(\"token\", data.token);",
+                  "}",
+                  "pm.execution.setNextRequest(\"bc0c1218-b770-5258-a4f4-4764ccbd52dd\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "bc0c1218-b770-5258-a4f4-4764ccbd52dd",
+          "name": "Registrar usuário B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/register",
+            "description": "Registrar usuário B.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário B Postman\",\n  \"email\": \"{{emailB}}\",\n  \"username\": \"{{usernameB}}\",\n  \"password\": \"Postman-local-123!\",\n  \"password_confirmation\": \"Postman-local-123!\",\n  \"device_name\": \"Postman B\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const stamp = pm.variables.replaceIn(\"{{$timestamp}}\");",
+                  "pm.collectionVariables.set(\"emailB\", \"postman_b_\" + stamp + \"@example.com\");",
+                  "pm.collectionVariables.set(\"usernameB\", \"pm_b_\" + stamp);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"otherUserId\", data.user.id);",
+                  "    pm.collectionVariables.set(\"token\", data.token);",
+                  "    pm.collectionVariables.set(\"otherToken\", data.token);",
+                  "}",
+                  "pm.execution.setNextRequest(\"49322dfe-d99a-5d7f-8284-bf86537e06fd\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "49322dfe-d99a-5d7f-8284-bf86537e06fd",
+          "name": "Login do usuário A",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/login",
+            "description": "Login do usuário A.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailA}}\",\n  \"password\": \"Postman-local-123!\",\n  \"device_name\": \"Postman Runner\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"token\", data.token);",
+                  "    pm.collectionVariables.set(\"userId\", data.user.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"3db6cc3b-c00b-531f-b966-728c01f8a633\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3db6cc3b-c00b-531f-b966-728c01f8a633",
+          "name": "Consultar sessão",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me",
+            "description": "Consultar sessão."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"30bdb386-56e8-587a-8b70-d0e70cc30dea\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "30bdb386-56e8-587a-8b70-d0e70cc30dea",
+          "name": "Consultar sessão (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"b8f67ac2-014e-5a2e-9082-6f40b0d22c7e\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b8f67ac2-014e-5a2e-9082-6f40b0d22c7e",
+          "name": "Consultar sessão (alias user)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/user",
+            "description": "Consultar sessão (alias user)."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"3fd0343e-62ab-5bce-ad11-7fd1a450c8f2\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3fd0343e-62ab-5bce-ad11-7fd1a450c8f2",
+          "name": "Consultar sessão (alias user) (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/user",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"6db6054f-51cd-5180-bcd9-27d3220291b5\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "324048db-6f2c-5a59-906b-1a8659e595b1",
+          "name": "Logout de A",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/logout",
+            "description": "Logout de A."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(null);"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Senha",
+      "item": [
+        {
+          "id": "2155ad41-3b38-557a-a20b-471f85fb96cb",
+          "name": "Solicitar código (manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/password/forgot",
+            "description": "Manual: envia o código ao e-mail de A; consulte o transporte de e-mail configurado no Laravel.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailA}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "40be4943-f1c9-5232-8d7f-a704b394c298",
+          "name": "Redefinir senha (manual)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/password/reset",
+            "description": "Manual: informe resetCode com os seis dígitos recebidos. Código válido obrigatório; revoga sessões existentes.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{emailA}}\",\n  \"code\": \"{{resetCode}}\",\n  \"password\": \"Postman-local-123!\",\n  \"password_confirmation\": \"Postman-local-123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Perfil e privacidade",
+      "item": [
+        {
+          "id": "6db6054f-51cd-5180-bcd9-27d3220291b5",
+          "name": "Atualizar perfil",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me",
+            "description": "Atualizar perfil.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuário A atualizado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"f46fa97a-baca-5e2e-a985-e3893970631b\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "f46fa97a-baca-5e2e-a985-e3893970631b",
+          "name": "Consultar privacidade",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me/privacy",
+            "description": "Consultar privacidade."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"84fb214a-9197-503b-bab4-b7b490630362\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "84fb214a-9197-503b-bab4-b7b490630362",
+          "name": "Consultar privacidade (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me/privacy",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"fd1f75f3-d155-5da8-ac1b-5bfd0d3756f0\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "fd1f75f3-d155-5da8-ac1b-5bfd0d3756f0",
+          "name": "Atualizar privacidade",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me/privacy",
+            "description": "Atualizar privacidade.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"read_receipts_enabled\": true,\n  \"notification_preview_enabled\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"47862259-26ea-506f-894c-2dc09e966530\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "47862259-26ea-506f-894c-2dc09e966530",
+          "name": "Alterar senha",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me/password",
+            "description": "Altera a senha de A; mantém a sessão atual. A próxima execução registra novas contas.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"Postman-local-123!\",\n  \"password\": \"Postman-nova-123!\",\n  \"password_confirmation\": \"Postman-nova-123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"11618b04-e513-5475-a811-ca61a0f06610\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "758cf629-b718-51c7-83dc-0eb295a1685c",
+          "name": "Desativar conta (manual)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me",
+            "description": "Manual: desativa A e revoga suas sessões. Faça login novamente antes, após concluir o fluxo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"Postman-nova-123!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Usuários",
+      "item": [
+        {
+          "id": "11618b04-e513-5475-a811-ca61a0f06610",
+          "name": "Buscar usuário B",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users?search={{usernameB}}&page=1",
+            "description": "Buscar usuário B."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"b3240535-7d17-5205-886c-eaf08797351d\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b3240535-7d17-5205-886c-eaf08797351d",
+          "name": "Buscar usuário B (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users?search={{usernameB}}&page=1",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"480d21ae-4bf2-5824-9806-6cd1838bcd79\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "480d21ae-4bf2-5824-9806-6cd1838bcd79",
+          "name": "Consultar usuário B",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{otherUserId}}",
+            "description": "Consultar usuário B."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"f2d6e6f2-d9bf-5b63-b02f-c3362a89d4ac\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "f2d6e6f2-d9bf-5b63-b02f-c3362a89d4ac",
+          "name": "Consultar usuário B (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{otherUserId}}",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"72a57f19-8996-5543-b62e-6b278dee1107\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bloqueios",
+      "item": [
+        {
+          "id": "8996b72c-377f-5af7-9c79-4b6304fe2052",
+          "name": "Bloquear B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/blocks",
+            "description": "Bloquear B.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{otherUserId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "if (pm.response.code === 200) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"blockedUserId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"3a6b94a3-00b9-5b4e-b587-8fd6356b9f6b\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3a6b94a3-00b9-5b4e-b587-8fd6356b9f6b",
+          "name": "Listar bloqueios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/blocks?page=1",
+            "description": "Listar bloqueios."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"0ec6239f-f3d3-5002-a08e-629b98960bce\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "0ec6239f-f3d3-5002-a08e-629b98960bce",
+          "name": "Listar bloqueios (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/blocks?page=1",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"126aef80-81f9-516a-b085-ef092c95ad04\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "126aef80-81f9-516a-b085-ef092c95ad04",
+          "name": "Desbloquear B",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/blocks/{{otherUserId}}",
+            "description": "Desbloquear B."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"19e8ed74-e335-5f1f-963f-fa23569254ba\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chaves",
+      "item": [
+        {
+          "id": "72a57f19-8996-5543-b62e-6b278dee1107",
+          "name": "Publicar chave de A",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me/keys",
+            "description": "Publicar chave de A.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"public_payload\": \"aGVsbG8=\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"keyId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"b13e6349-5ee3-5f2e-a6c7-533be41aa81d\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b13e6349-5ee3-5f2e-a6c7-533be41aa81d",
+          "name": "Publicar chave de B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/me/keys",
+            "description": "Publicar chave de B.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{otherToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"public_payload\": \"aGVsbG8=\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"otherKeyId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"f69d3841-08ac-54db-b3de-bf47a34c7e9d\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "f69d3841-08ac-54db-b3de-bf47a34c7e9d",
+          "name": "Consultar chave atual de B",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{otherUserId}}/keys/current",
+            "description": "Consultar chave atual de B."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"75c1857c-3b2b-5e8c-9330-e3ab60b2015e\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "75c1857c-3b2b-5e8c-9330-e3ab60b2015e",
+          "name": "Consultar chave atual de B (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{otherUserId}}/keys/current",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"80e4a8e8-6944-5864-9475-787bc57d2c08\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Conversas",
+      "item": [
+        {
+          "id": "80e4a8e8-6944-5864-9475-787bc57d2c08",
+          "name": "Criar conversa com B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations",
+            "description": "Criar conversa com B.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{otherUserId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"conversationId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"a67717e8-fbfc-580c-8ebe-8e05a28f1e55\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "a67717e8-fbfc-580c-8ebe-8e05a28f1e55",
+          "name": "Listar conversas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations?page=1",
+            "description": "Listar conversas."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"54abf2d4-d933-56d0-b921-7f8be0c37ecb\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "54abf2d4-d933-56d0-b921-7f8be0c37ecb",
+          "name": "Listar conversas (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations?page=1",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"9d88401e-9b1e-59b5-b8c1-6c50509030bf\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "9d88401e-9b1e-59b5-b8c1-6c50509030bf",
+          "name": "Consultar conversa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}",
+            "description": "Consultar conversa."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"f9d68a97-0c95-572e-ab3c-988d839670f0\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "f9d68a97-0c95-572e-ab3c-988d839670f0",
+          "name": "Consultar conversa (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"e7f088bf-766d-5563-81ca-c65d38c0f855\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "36735711-241b-5907-9d3e-3a9e4c426770",
+          "name": "Arquivar conversa",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}",
+            "description": "Arquivar conversa."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"324048db-6f2c-5a59-906b-1a8659e595b1\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mensagens",
+      "item": [
+        {
+          "id": "d0d6c976-f6b9-52b8-8fc2-8f268b13516f",
+          "name": "Enviar mensagem com anexo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}/messages",
+            "description": "Enviar mensagem com anexo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encrypted_body\": \"aGVsbG8=\",\n  \"temporary_upload_ids\": [\n    \"{{uploadId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"messageId\", data.id);",
+                  "    pm.collectionVariables.set(\"attachmentId\", data.attachments[0].id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"3fc4e766-fbdf-5178-9320-f72e7fafc867\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3fc4e766-fbdf-5178-9320-f72e7fafc867",
+          "name": "Consultar histórico",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}/messages?limit=30",
+            "description": "Consultar histórico."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"01db4c1a-448e-5070-aea9-e63d1675583d\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "01db4c1a-448e-5070-aea9-e63d1675583d",
+          "name": "Consultar histórico (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}/messages?limit=30",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"dd93dab3-667e-554a-aedc-eed9fd74c0f7\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "dd93dab3-667e-554a-aedc-eed9fd74c0f7",
+          "name": "Marcar entrega como B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/messages/{{messageId}}/delivered",
+            "description": "Marcar entrega como B.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{otherToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.execution.setNextRequest(\"53ed015a-4247-5487-81bd-3a184418a263\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "53ed015a-4247-5487-81bd-3a184418a263",
+          "name": "Marcar leitura como B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/messages/{{messageId}}/read",
+            "description": "Marcar leitura como B.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{otherToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.execution.setNextRequest(\"ff038746-aea8-5a55-89d4-b6ff96020aab\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "ff038746-aea8-5a55-89d4-b6ff96020aab",
+          "name": "Editar mensagem (futuro)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/messages/{{messageId}}",
+            "description": "Operação futura: retorna 501 para participante autorizado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"encrypted_body\": \"aGVsbG8=\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 501\", function () { pm.response.to.have.status(501); });",
+                  "pm.execution.setNextRequest(\"8283648e-43f8-5be9-b0f6-5e0bd1ef01fb\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "8283648e-43f8-5be9-b0f6-5e0bd1ef01fb",
+          "name": "Excluir mensagem (futuro)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/messages/{{messageId}}",
+            "description": "Operação futura: retorna 501 para participante autorizado."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 501\", function () { pm.response.to.have.status(501); });",
+                  "pm.execution.setNextRequest(\"b3d9ec0d-0e99-5fe7-9cfa-1560bacb123b\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Grupos",
+      "item": [
+        {
+          "id": "47f0477d-f949-5204-a272-f1a8d4c76e7b",
+          "name": "Criar grupo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups",
+            "description": "Criar grupo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Equipe Postman\",\n  \"member_ids\": [\n    \"{{otherUserId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"groupId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"f41fc1b7-96bd-5b36-b55b-d9667591ec1a\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "f41fc1b7-96bd-5b36-b55b-d9667591ec1a",
+          "name": "Listar grupos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups",
+            "description": "Listar grupos."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"a4f72fde-6f91-57a1-a292-2b3082e2d5ea\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "a4f72fde-6f91-57a1-a292-2b3082e2d5ea",
+          "name": "Listar grupos (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"ef3e1e3a-dbb3-50a3-a07a-48be0becf7d4\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "ef3e1e3a-dbb3-50a3-a07a-48be0becf7d4",
+          "name": "Consultar grupo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}",
+            "description": "Consultar grupo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"b7e0cd3c-5317-5bb7-84d0-df06e4aaf892\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b7e0cd3c-5317-5bb7-84d0-df06e4aaf892",
+          "name": "Consultar grupo (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"d05fdde4-d45e-56a1-bfc8-a859c14b18ca\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "d05fdde4-d45e-56a1-bfc8-a859c14b18ca",
+          "name": "Renomear grupo",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}",
+            "description": "Renomear grupo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Equipe Postman atualizada\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"7f11f93f-8b77-5705-b811-2591f69cf9a9\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "7f11f93f-8b77-5705-b811-2591f69cf9a9",
+          "name": "Remover B do grupo",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}/members/{{otherUserId}}",
+            "description": "Remover B do grupo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.execution.setNextRequest(\"67ac2560-8616-55b9-aed4-d257284345b0\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "67ac2560-8616-55b9-aed4-d257284345b0",
+          "name": "Adicionar B ao grupo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}/members",
+            "description": "Adicionar B ao grupo.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"member_ids\": [\n    \"{{otherUserId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"af1ab1e4-81d9-524c-ba57-52d7e2a48b3a\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "af1ab1e4-81d9-524c-ba57-52d7e2a48b3a",
+          "name": "Promover B a responsável",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}/responsibles/{{otherUserId}}",
+            "description": "Promover B a responsável."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.execution.setNextRequest(\"fcca6359-0e81-5a48-adb9-0e99fb49d22c\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "fcca6359-0e81-5a48-adb9-0e99fb49d22c",
+          "name": "Remover responsabilidade de B",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}/responsibles/{{otherUserId}}",
+            "description": "Remover responsabilidade de B."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.execution.setNextRequest(\"d4d97955-d80a-5ee0-a81b-35d6dc9b4dd4\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "d4d97955-d80a-5ee0-a81b-35d6dc9b4dd4",
+          "name": "Sair e transferir responsabilidade para B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}/leave",
+            "description": "Sair e transferir responsabilidade para B.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"successor_user_id\": \"{{otherUserId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.execution.setNextRequest(\"84bab0fa-b5c0-5697-b449-8853f98f894e\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "84bab0fa-b5c0-5697-b449-8853f98f894e",
+          "name": "Encerrar grupo como B",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/groups/{{groupId}}",
+            "description": "Encerrar grupo como B.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{otherToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 204\", function () { pm.response.to.have.status(204); });",
+                  "pm.execution.setNextRequest(\"8996b72c-377f-5af7-9c79-4b6304fe2052\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Arquivos",
+      "item": [
+        {
+          "id": "e7f088bf-766d-5563-81ca-c65d38c0f855",
+          "name": "Criar upload descartável",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}/uploads",
+            "description": "Envia bytes cifrados como upload temporário. Selecione um arquivo local não vazio no campo file (ex.: .txt).",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "contentType": "application/octet-stream"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"uploadId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"e3a9d08e-5e07-552c-bede-cea6f812e181\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "e3a9d08e-5e07-552c-bede-cea6f812e181",
+          "name": "Remover upload descartável",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/uploads/{{uploadId}}",
+            "description": "Remover upload descartável."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"e89e8a50-f8be-5e3e-b3fb-7c8d88bae8ba\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "e89e8a50-f8be-5e3e-b3fb-7c8d88bae8ba",
+          "name": "Upload para a mensagem",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/conversations/{{conversationId}}/uploads",
+            "description": "Envia bytes cifrados como upload temporário. Selecione um arquivo local não vazio no campo file (ex.: .txt).",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": [],
+                  "contentType": "application/octet-stream"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"uploadId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"d0d6c976-f6b9-52b8-8fc2-8f268b13516f\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b3d9ec0d-0e99-5fe7-9cfa-1560bacb123b",
+          "name": "Consultar anexo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/attachments/{{attachmentId}}",
+            "description": "Consultar anexo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"9454c110-8ffa-5ee0-abb6-81f2ff9c4710\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "9454c110-8ffa-5ee0-abb6-81f2ff9c4710",
+          "name": "Consultar anexo (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/attachments/{{attachmentId}}",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"21b3a654-c5fb-5491-808c-19aa6dfecbaa\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "21b3a654-c5fb-5491-808c-19aa6dfecbaa",
+          "name": "Baixar anexo cifrado",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/attachments/{{attachmentId}}/download",
+            "description": "Baixa bytes cifrados; o servidor não decifra o conteúdo."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"42141488-80c3-53b4-a692-84cecfa16f36\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "42141488-80c3-53b4-a692-84cecfa16f36",
+          "name": "Baixar anexo cifrado (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/attachments/{{attachmentId}}/download",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"778a4594-2330-5640-bfb5-c1833e175197\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "778a4594-2330-5640-bfb5-c1833e175197",
+          "name": "Editar anexo (futuro)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/attachments/{{attachmentId}}",
+            "description": "Operação futura: retorna 501 para o autor autorizado.",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 501\", function () { pm.response.to.have.status(501); });",
+                  "pm.execution.setNextRequest(\"2e5245d4-f235-5a51-8b40-5902a9569dd5\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "2e5245d4-f235-5a51-8b40-5902a9569dd5",
+          "name": "Excluir anexo (futuro)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/attachments/{{attachmentId}}",
+            "description": "Operação futura: retorna 501 para o autor autorizado."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 501\", function () { pm.response.to.have.status(501); });",
+                  "pm.execution.setNextRequest(\"47f0477d-f949-5204-a272-f1a8d4c76e7b\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Denúncias",
+      "item": [
+        {
+          "id": "19e8ed74-e335-5f1f-963f-fa23569254ba",
+          "name": "Denunciar B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports",
+            "description": "Denunciar B.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reported_user_id\": \"{{otherUserId}}\",\n  \"reason\": \"Spam ou mensagens repetitivas\",\n  \"narrative\": \"Mensagens repetitivas no cenário local de teste.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"reportId\", data.id);",
+                  "}",
+                  "pm.execution.setNextRequest(\"0964a3bc-d0d3-5ee6-8d97-1488a099837e\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "0964a3bc-d0d3-5ee6-8d97-1488a099837e",
+          "name": "Listar minhas denúncias",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports?page=1",
+            "description": "Listar minhas denúncias."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"9d7b209a-4086-5929-80d8-7ab89a3a7008\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "9d7b209a-4086-5929-80d8-7ab89a3a7008",
+          "name": "Listar minhas denúncias (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports?page=1",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"36211282-d0b6-5a28-9ede-3df749b6ac09\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "36211282-d0b6-5a28-9ede-3df749b6ac09",
+          "name": "Consultar denúncia",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}",
+            "description": "Consultar denúncia."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"cd81ad6f-8765-5dfa-87f8-941367f8841f\");"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "cd81ad6f-8765-5dfa-87f8-941367f8841f",
+          "name": "Consultar denúncia (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/reports/{{reportId}}",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.execution.setNextRequest(\"36735711-241b-5907-9d3e-3a9e4c426770\");"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "id": "036bcb6c-71e7-5893-ad28-b1c641c276dc",
+          "name": "Painel administrativo",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/dashboard",
+            "description": "Painel administrativo.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "132ee148-067b-5d14-9048-ad6016e51c1a",
+          "name": "Painel administrativo (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/dashboard",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "c8e039b8-3f04-5963-b444-41cc02e13307",
+          "name": "Listar contas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users?page=1",
+            "description": "Listar contas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "089fadbd-9605-5c70-9102-dc4d16764295",
+          "name": "Listar contas (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users?page=1",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "b786c267-3b8f-5721-8edd-b8a7269ad494",
+          "name": "Consultar conta B",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{otherUserId}}",
+            "description": "Consultar conta B.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "27eabf40-8e9e-54f1-bf4b-ddefa018a11e",
+          "name": "Consultar conta B (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{otherUserId}}",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "652bc98e-b906-5b5b-9251-9f11447289f8",
+          "name": "Bloquear conta B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{otherUserId}}/block",
+            "description": "Bloquear conta B.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Bloqueio administrativo de teste local.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 201\", function () { pm.response.to.have.status(201); });",
+                  "if (pm.response.code === 201) {",
+                  "    const data = pm.response.json().data;",
+                  "    pm.collectionVariables.set(\"accountBlockId\", data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "170d9982-6237-558f-80e9-3fdf425f1a9c",
+          "name": "Desbloquear conta B",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/users/{{otherUserId}}/unblock",
+            "description": "Desbloquear conta B.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "bd6ef579-2ed8-5d6e-b71b-42c0a8d8eb0d",
+          "name": "Listar denúncias administrativas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/reports?page=1",
+            "description": "Listar denúncias administrativas.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "70ee86c4-7db5-5233-b214-ddfc4cd99b30",
+          "name": "Listar denúncias administrativas (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/reports?page=1",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3196ed19-243a-5fca-bdaa-e8cd003eb88a",
+          "name": "Consultar denúncia administrativa",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/reports/{{reportId}}",
+            "description": "Consultar denúncia administrativa.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "fee81da0-e7e4-5d6a-b4e8-ae0d7aae59d0",
+          "name": "Consultar denúncia administrativa (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/reports/{{reportId}}",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "ec015083-2fc5-5eb4-96ba-e946eddba3fc",
+          "name": "Concluir denúncia",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/reports/{{reportId}}/conclude",
+            "description": "Concluir denúncia.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"decision\": \"Análise local concluída.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "e0263615-9eb7-5090-8c54-1abbb10cae37",
+          "name": "Arquivar denúncia",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/reports/{{reportId}}",
+            "description": "Arquivar denúncia.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "3c08fe96-be39-5872-8529-025394d6a513",
+          "name": "Consultar configurações",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/settings",
+            "description": "Consultar configurações.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "89d045f3-dd7c-5758-9d8a-b69b6a629b7b",
+          "name": "Consultar configurações (HEAD)",
+          "request": {
+            "method": "HEAD",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/admin/settings",
+            "description": "Consulta apenas os cabeçalhos, sem corpo de resposta.",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminToken}}",
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status esperado: 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "description": "Execute separadamente com adminToken preenchido. DatabaseSeeder.php cria admin@example.com (username admin), usando UserFactory.php: em APP_ENV=local a senha é password; fora de local é aleatória. Veja docs/postman/README.md. Não execute seed repetidamente no mesmo banco. Execute o fluxo principal antes para preencher otherUserId e reportId.",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{adminToken}}",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ]
+}
