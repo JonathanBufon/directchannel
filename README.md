@@ -142,6 +142,7 @@ Passo a passo manual em [docs/SETUP.md](docs/SETUP.md).
 | [Ajustes de requisitos](docs/REQUISITOS-AJUSTES.md) | Proposta RF28–RF30 e revisão de RNF |
 | [Planejamento P01–P12](docs/PLANEJAMENTO.md) | Tarefas da fase UX/UI, responsáveis e revisores |
 | [Arquitetura](docs/ARQUITETURA.md) | Camadas mobile/API, persistência, tempo real e modelo de dados |
+| [Postman](docs/postman/README.md) | Collection completa da API, ambiente local e execução no Runner |
 | [CRUDs](docs/CRUDS.md) | Divisão dos 6 CRUDs e contratos REST |
 | [Instalação manual](docs/SETUP.md) | Ambiente sem Makefile e notas de segurança |
 | [Colaboração no GitHub](docs/GITHUB.md) | Branches e Pull Requests |
