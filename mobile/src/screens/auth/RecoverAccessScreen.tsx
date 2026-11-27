@@ -23,9 +23,15 @@ export const RecoverAccessScreen: React.FC = () => {
 
             // Requisito RF27: Fluxo não revela cadastro do e-mail.
             Alert.alert(
-                'Instruções enviadas',
-                'Se o e-mail estiver cadastrado em nossa base, você receberá um código de recuperação em instantes.',
-                [{ text: 'OK', onPress: () => navigation.goBack() }]
+                'Instruções Enviadas',
+                'Se o e-mail estiver cadastrado, você receberá um código em instantes.',
+                [
+                    {
+                        text: 'Inserir código agora',
+                        onPress: () => navigation.navigate('ResetPassword', { email }),
+                    },
+                    { text: 'Voltar ao login', onPress: () => navigation.goBack() },
+                ]
             );
         } catch (error) {
             setApiError('Ocorreu um erro ao processar seu pedido. Tente novamente.');

@@ -76,20 +76,7 @@ export const ContactInfoScreen: React.FC = () => {
                 {/* Bloquear Contato (T21) */}
                 <Pressable
                     style={styles.actionRow}
-                    onPress={() =>
-                        Alert.alert(
-                            `Bloquear ${name}?`,
-                            'Você deixará de receber novas mensagens diretas deste contato. O bloqueio não apaga mensagens já recebidas.',
-                            [
-                                { text: 'Cancelar', style: 'cancel' },
-                                {
-                                    text: 'Confirmar bloqueio',
-                                    style: 'destructive',
-                                    onPress: () => Alert.alert('Bloqueado', `${name} foi adicionado à lista de contatos bloqueados.`),
-                                },
-                            ]
-                        )
-                    }
+                    onPress={() => navigation.navigate('BlockContact', { userId, name })}
                 >
                     <View style={styles.actionTextContainer}>
                         <Label variant="body" style={styles.actionTitle}>
@@ -107,19 +94,7 @@ export const ContactInfoScreen: React.FC = () => {
                 {/* Denunciar Usuário (T10) */}
                 <Pressable
                     style={[styles.actionRow, styles.lastActionRow]}
-                    onPress={() =>
-                        Alert.alert(
-                            `Denunciar ${username}`,
-                            'O relatório será avaliado pela administração sem encaminhar suas conversas privadas.',
-                            [
-                                { text: 'Cancelar', style: 'cancel' },
-                                {
-                                    text: 'Enviar denúncia',
-                                    onPress: () => Alert.alert('Denúncia Enviada', 'Agradecemos o seu relato. Nenhuma mensagem privada foi exposta.'),
-                                },
-                            ]
-                        )
-                    }
+                    onPress={() => navigation.navigate('ReportUser', { userId, username })}
                 >
                     <View style={styles.actionTextContainer}>
                         <Label variant="body" style={styles.dangerTitle}>

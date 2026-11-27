@@ -1,6 +1,6 @@
 // mobile/src/screens/LoginScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet, Alert, Pressable } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { RootNavigationProp } from '../../types/navigation';
 import { CenteredTemplate } from '../../components/templates/CenteredTemplate';
@@ -32,6 +32,11 @@ export const LoginScreen: React.FC = () => {
         try {
             // Simulação da resposta da API com Token JWT e Perfil
             await new Promise((resolve) => setTimeout(resolve, 1000));
+
+            if (credentials.email.toLowerCase().includes('admin')) {
+                navigation.replace('AdminDashboard');
+                return;
+            }
 
             const mockJwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.directchannel_secure_payload';
 
@@ -81,6 +86,16 @@ export const LoginScreen: React.FC = () => {
                 onForgotPassword={() => navigation.navigate('RecoverAccess')}
                 onCreateAccount={() => navigation.navigate('Register')}
             />
+
+            {/* Atalho de Demonstração Acadêmica (Wireframe T01 / Pág. 19) */}
+            <Pressable
+                onPress={() => navigation.replace('AdminDashboard')}
+                style={{ marginTop: 24, alignItems: 'center' }}
+            >
+                <Label variant="caption" style={{ color: colors.primary, fontWeight: '600' }}>
+                    Atalho: Painel Administrativo (A01) ›
+                </Label>
+            </Pressable>
         </CenteredTemplate>
     );
 };

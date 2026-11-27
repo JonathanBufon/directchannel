@@ -20,7 +20,18 @@ import { LeaveGroupScreen } from '../screens/groups/LeaveGroupScreen';
 import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
 import { PrivacyScreen } from '../screens/profile/PrivacyScreen';
 import { BlockedContactsScreen } from '../screens/profile/BlockedContactsScreen';
+import { CodeChangedScreen } from '../screens/conversations/CodeChangedScreen';
+import { BlockContactScreen } from '../screens/conversations/BlockContactScreen';
+import { ResetPasswordScreen } from '../screens/auth/ResetPasswordScreen';
+import { ReportSentScreen } from '../screens/reports/ReportSentScreen';
+import { AdminDashboardScreen } from '../screens/admin/AdminDashboardScreen';
+import { AdminUsersScreen } from '../screens/admin/AdminUsersScreen';
+import { AdminManageAccountScreen } from '../screens/admin/AdminManageAccountScreen';
+import { AdminReportsScreen } from '../screens/admin/AdminReportsScreen';
+import { AdminReviewReportScreen } from '../screens/admin/AdminReviewReportScreen';
+import { AdminSettingsScreen } from '../screens/admin/AdminSettingsScreen';
 import { colors } from '../theme';
+import { ReportUserScreen } from '../screens/reports/ReportUserScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -118,6 +129,61 @@ export const RootNavigator: React.FC = () => {
             <Stack.Screen
                 name="BlockedContacts"
                 component={BlockedContactsScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="CodeChanged"
+                component={CodeChangedScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="BlockContact"
+                component={BlockContactScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="ResetPassword"
+                component={ResetPasswordScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="ReportSent"
+                component={ReportSentScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="ReportUser"
+                component={ReportUserScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="AdminDashboard"
+                component={AdminDashboardScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="AdminUsers"
+                component={AdminUsersScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="AdminManageAccount"
+                component={AdminManageAccountScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="AdminReports"
+                component={AdminReportsScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="AdminReviewReport"
+                component={AdminReviewReportScreen}
+                options={{ headerShown: false }}
+            />
+            <Stack.Screen
+                name="AdminSettings"
+                component={AdminSettingsScreen}
                 options={{ headerShown: false }}
             />
         </Stack.Navigator>
