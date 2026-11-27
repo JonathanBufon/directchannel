@@ -1,0 +1,142 @@
+# DirectChannel — draft do Blueprint para gerar models, migrations e factories.
+# Derivado de specs/001-especificacao-funcional-mobile/blueprint-diagram.yaml.
+# Fora deste draft (tratados a mão):
+#   - User: extensões (username, is_admin, deleted_at) em migration de alteração própria.
+#   - PersonalAccessToken: migration oficial do Sanctum.
+#   - TemporaryUpload: migration/model próprios (temporary_uploads).
+# Constraints que o Blueprint não gera (UNIQUE parciais, FK composta, PKs compostas,
+# CHECKs) são revisadas à mão nas migrations; UNIQUEs parciais, FK composta e CHECKs
+# ficam em *_add_domain_constraints.php. PKs são corrigidas nas migrations de criação.
+# reports.status persiste recebida/concluida; o rótulo concluída pertence à API.
+
+models:
+  AccessGrant:
+    user_id: id foreign:users onDelete:restrict
+    started_at: timestampTz:6 useCurrent
+    revoked_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - index: user_id, id
+    relationships:
+      hasMany: AccessGrantToken
+
+  AccessGrantToken:
+    id: false
+    personal_access_token_id: id foreign:personal_access_tokens onDelete:restrict
+    access_grant_id: id foreign:access_grants onDelete:restrict
+    timestamps: false
+    indexes:
+      - index: access_grant_id
+
+  Conversation:
+    kind: string:16
+    created_at: timestampTz:6 useCurrent
+    timestamps: false
+    relationships:
+      hasOne: Group
+      hasMany: ConversationParticipant, Message
+
+  ConversationParticipant:
+    conversation_id: id foreign:conversations onDelete:restrict
+    user_id: id foreign:users onDelete:restrict
+    joined_at: timestampTz:6 useCurrent
+    left_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - unique: id, conversation_id
+      - index: user_id, conversation_id, joined_at, id
+      - index: conversation_id, user_id, joined_at, left_at
+    relationships:
+      hasOne: GroupMember
+
+  Group:
+    conversation_id: id foreign:conversations onDelete:restrict unique
+    name: string:100
+    timestamps: false
+    relationships:
+      hasMany: GroupMember
+
+  GroupMember:
+    id: false
+    participant_id: id:ConversationParticipant foreign:conversation_participants onDelete:restrict
+    group_id: id foreign:groups onDelete:restrict
+    is_responsible: boolean default:false
+    timestamps: false
+    indexes:
+      - index: group_id, participant_id
+
+  Message:
+    conversation_id: id foreign:conversations onDelete:restrict
+    sender_participant_id: id:ConversationParticipant
+    encrypted_body: binary
+    accepted_at: timestampTz:6 useCurrent
+    timestamps: false
+    indexes:
+      - index: conversation_id, accepted_at, id
+      - index: sender_participant_id, conversation_id
+    relationships:
+      hasMany: Attachment, MessageReceipt
+
+  MessageReceipt:
+    id: false
+    message_id: id foreign:messages onDelete:restrict
+    recipient_participant_id: id:ConversationParticipant foreign:conversation_participants onDelete:restrict
+    delivered_at: timestampTz:6 nullable
+    read_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - index: recipient_participant_id, message_id
+
+  Attachment:
+    message_id: id foreign:messages onDelete:restrict
+    storage_key: string:255
+    size_bytes: unsignedBigInteger
+    timestamps: false
+    indexes:
+      - index: message_id, id
+
+  Block:
+    id: false
+    blocker_user_id: id:User foreign:users onDelete:restrict
+    blocked_user_id: id:User foreign:users onDelete:restrict
+    timestamps: false
+    indexes:
+      - index: blocked_user_id
+
+  Report:
+    reporter_user_id: id:User foreign:users onDelete:restrict
+    reported_user_id: id:User foreign:users onDelete:restrict
+    reason: string:50
+    narrative: text nullable
+    status: string:16 default:'recebida'
+    reviewer_user_id: id:User nullable foreign:users onDelete:restrict
+    decision: text nullable
+    decided_at: timestampTz:6 nullable
+    created_at: timestampTz:6 useCurrent
+    deleted_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - index: status, created_at, id
+      - index: reporter_user_id, id
+      - index: reported_user_id, id
+
+  AccountBlock:
+    user_id: id foreign:users onDelete:restrict
+    blocked_by_user_id: id:User foreign:users onDelete:restrict
+    reason: text
+    blocked_at: timestampTz:6 useCurrent
+    unblocked_by_user_id: id:User nullable foreign:users onDelete:restrict
+    unblocked_at: timestampTz:6 nullable
+    timestamps: false
+    indexes:
+      - index: user_id, blocked_at, id
+
+  PublicKeyMaterial:
+    meta:
+      table: public_key_material
+    user_id: id foreign:users onDelete:restrict
+    public_payload: binary
+    published_at: timestampTz:6 useCurrent
+    timestamps: false
+    indexes:
+      - index: user_id, published_at, id
