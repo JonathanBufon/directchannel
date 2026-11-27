@@ -67,4 +67,9 @@ final class Conversation extends Model
     {
         return $this->hasMany(TemporaryUpload::class, 'conversation_id');
     }
+
+    public function latestMessage(): HasOne
+    {
+        return $this->hasOne(Message::class, 'conversation_id')->ofMany(['accepted_at' => 'max', 'id' => 'max']);
+    }
 }

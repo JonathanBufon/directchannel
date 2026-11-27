@@ -33,4 +33,17 @@ final class Group extends Model
     {
         return $this->hasMany(GroupMember::class, 'group_id');
     }
+
+    public function activeMembers(): HasMany
+    {
+        return $this->groupMembers()->whereHas('participant', fn ($query) => $query->active());
+    }
+
+    public function isResponsible(User $user): bool
+    {
+        $participant = $this->conversation->activeParticipantFor($user);
+
+        return $participant !== null && $this->groupMembers()
+            ->where('participant_id', $participant->id)->where('is_responsible', true)->exists();
+    }
 }

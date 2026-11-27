@@ -13,3 +13,11 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', [AuthController::class, 'me']);
     Route::get('/user', [AuthController::class, 'me']);
 });
+
+require __DIR__.'/api/users.php';
+require __DIR__.'/api/conversations.php';
+require __DIR__.'/api/messages.php';
+require __DIR__.'/api/groups.php';
+require __DIR__.'/api/files.php';
+require __DIR__.'/api/reports.php';
+require __DIR__.'/api/admin.php';
