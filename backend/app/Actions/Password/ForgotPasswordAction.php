@@ -4,27 +4,39 @@ declare(strict_types=1);
 
 namespace App\Actions\Password;
 
+use App\Auth\PasswordResetCodes;
 use App\Models\User;
-use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Facades\Password;
+use App\Notifications\PasswordResetCodeNotification;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 
 final class ForgotPasswordAction
 {
+    public function __construct(private readonly PasswordResetCodes $codes) {}
+
     public function execute(string $email): void
     {
-        // T22 accepts the broker's opaque token directly; no web reset route is required.
-        ResetPassword::toMailUsing(fn (User $user, string $token): MailMessage => (new MailMessage)
-            ->subject('Redefinir senha do DirectChannel')
-            ->greeting('Olá, '.$user->name.'!')
-            ->line('Recebemos uma solicitação para redefinir sua senha.')
-            ->line('Informe este código na tela de redefinição de senha do aplicativo:')
-            ->line($token)
-            ->line('O código expira em '.config('auth.passwords.users.expire').' minutos.')
-            ->line('Se você não solicitou a redefinição, ignore este e-mail.')
-            ->salutation('Equipe DirectChannel'));
+        DB::transaction(function () use ($email): void {
+            // Serialize issuance and reset on the same active account.
+            $user = User::where('email', $email)->lockForUpdate()->first();
+            if ($user === null) {
+                return;
+            }
 
-        // All broker outcomes, including an unknown user or its own throttle, are private.
-        Password::sendResetLink(['email' => $email]);
+            $notificationKey = 'password-reset-notification:'.$user->id;
+            if (RateLimiter::tooManyAttempts($notificationKey, 1)) {
+                return;
+            }
+
+            $createdAt = DB::table('password_reset_tokens')->where('email', $email)->value('created_at');
+            if ($createdAt !== null && Carbon::parse($createdAt)->addSeconds(60)->isFuture()) {
+                return;
+            }
+
+            $user->notify(new PasswordResetCodeNotification($this->codes->issue($user)));
+            // Consumption removes the code, but must not remove the mail cooldown.
+            RateLimiter::hit($notificationKey, 60);
+        }, 3);
     }
 }
