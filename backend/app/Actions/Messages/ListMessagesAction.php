@@ -17,7 +17,7 @@ final class ListMessagesAction
         Gate::authorize('viewAny', [Message::class, $conversation]);
         $participant = $conversation->activeParticipantFor($user);
         $query = $conversation->messages()
-            ->where('accepted_at', '>=', $participant->joined_at->format('Y-m-d H:i:s.uP'));
+            ->visibleTo($user);
         if ($beforeId !== null) {
             $cursor = (clone $query)->whereKey($beforeId)->firstOrFail();
             $acceptedAt = $cursor->getRawOriginal('accepted_at');

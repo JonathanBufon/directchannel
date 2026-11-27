@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Uploads;
 
-use App\Models\AppSetting;
 use App\Models\Conversation;
 use App\Models\ConversationParticipant;
 use App\Models\TemporaryUpload;
@@ -59,12 +58,12 @@ final class UploadsTest extends TestCase
     {
         $user = $this->signIn();
         $conversation = $this->conversation($user);
-        AppSetting::create(['key' => 'max_upload_bytes', 'value' => 1025]);
+        config(['directchannel.max_upload_mb' => 1]);
         $this->postJson('/api/conversations/'.$conversation->id.'/uploads', [
-            'file' => UploadedFile::fake()->createWithContent('file.bin', random_bytes(1025)),
+            'file' => UploadedFile::fake()->createWithContent('file.bin', random_bytes(1024 * 1024)),
         ])->assertCreated();
         $this->postJson('/api/conversations/'.$conversation->id.'/uploads', [
-            'file' => UploadedFile::fake()->createWithContent('file.bin', random_bytes(1026)),
+            'file' => UploadedFile::fake()->createWithContent('file.bin', random_bytes(1024 * 1024 + 1)),
         ])->assertUnprocessable()->assertJsonValidationErrors('file');
         $this->assertDatabaseCount('temporary_uploads', 1);
     }

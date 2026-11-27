@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Files;
 
+use App\Models\AccessGrantToken;
 use App\Models\Conversation;
 use App\Models\TemporaryUpload;
 use App\Models\User;
@@ -25,6 +26,7 @@ final class StoreTemporaryUploadAction
         try {
             return TemporaryUpload::create([
                 'user_id' => $user->id,
+                'access_grant_id' => AccessGrantToken::findOrFail($user->currentAccessToken()->getKey())->access_grant_id,
                 'conversation_id' => $conversation->id,
                 'storage_key' => $path,
                 'original_name' => $file->getClientOriginalName(),

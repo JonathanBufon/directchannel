@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Casts\Binary;
+use App\Models\Concerns\UsesMicrosecondTimestamps;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class Message extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesMicrosecondTimestamps;
 
     public $timestamps = false;
 
@@ -28,6 +30,12 @@ final class Message extends Model
             'sender_participant_id' => 'integer',
             'encrypted_body' => Binary::class,
         ];
+    }
+
+    public function scopeVisibleTo(Builder $query, User $user): Builder
+    {
+        return $query->whereExists(ConversationParticipant::query()
+            ->where('user_id', $user->id)->seeingMessage()->selectRaw('1'));
     }
 
     public function conversation(): BelongsTo

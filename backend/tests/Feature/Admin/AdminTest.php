@@ -22,7 +22,7 @@ final class AdminTest extends TestCase
             ['GET', '/api/admin/users/{user}'], ['POST', '/api/admin/users/{user}/block'],
             ['POST', '/api/admin/users/{user}/unblock'], ['GET', '/api/admin/reports'],
             ['GET', '/api/admin/reports/{report}'], ['POST', '/api/admin/reports/{report}/conclude'],
-            ['DELETE', '/api/admin/reports/{report}'], ['GET', '/api/admin/settings'], ['PATCH', '/api/admin/settings'],
+            ['DELETE', '/api/admin/reports/{report}'], ['GET', '/api/admin/settings'],
         ];
     }
 

@@ -19,7 +19,7 @@ final class LeaveGroupAction
             $group = $this->context->lock($group, $actor, 'view');
             $member = $this->context->member($group, $actor);
             $members = $group->activeMembers()->with('participant')->orderBy('participant_id')->lockForUpdate()->get();
-            $needsSuccessor = $member->is_responsible && $members->count() > 1 && $members->where('is_responsible', true)->count() === 1;
+            $needsSuccessor = $member->is_responsible && $members->where('is_responsible', true)->count() === 1;
             if ($needsSuccessor) {
                 $successor = $members->first(fn ($candidate): bool => $candidate->participant->user_id === $successorUserId && $candidate->participant_id !== $member->participant_id);
                 if ($successor === null) {

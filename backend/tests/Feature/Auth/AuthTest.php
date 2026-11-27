@@ -211,7 +211,7 @@ final class AuthTest extends TestCase
     {
         $user = $this->user();
         $token = $this->login($user)->json('data.token');
-        $user->accessGrants()->active()->update(['revoked_at' => now()]);
+        $user->accessGrants()->active()->get()->each->update(['revoked_at' => now()]);
         $this->authenticated('GET', '/api/me', $token)->assertUnauthorized()->assertJsonPath('message', 'Acesso revogado. Faça login novamente.');
     }
 

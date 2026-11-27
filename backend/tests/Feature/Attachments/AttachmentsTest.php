@@ -31,7 +31,7 @@ final class AttachmentsTest extends TestCase
         Storage::fake('local');
         $reader = $this->signIn();
         $attachment = $this->attachment(User::factory()->create());
-        ConversationParticipant::factory()->for($reader, 'user')->create(['conversation_id' => $attachment->message->conversation_id]);
+        ConversationParticipant::factory()->for($reader, 'user')->create(['conversation_id' => $attachment->message->conversation_id, 'joined_at' => now()->subDay()]);
         $bytes = random_bytes(1024);
         Storage::disk('local')->put($attachment->storage_key, $bytes);
         $this->getJson('/api/attachments/'.$attachment->id)->assertExactJson(['data' => [
@@ -55,7 +55,7 @@ final class AttachmentsTest extends TestCase
         $attachment = $this->attachment(User::factory()->create());
         $uri = '/api/attachments/'.$attachment->id.$suffix;
         $this->json($method, $uri)->assertNotFound();
-        ConversationParticipant::factory()->left()->for($outsider, 'user')->create(['conversation_id' => $attachment->message->conversation_id]);
+        ConversationParticipant::factory()->left()->for($outsider, 'user')->create(['conversation_id' => $attachment->message->conversation_id, 'joined_at' => now()->subDay()]);
         $this->json($method, $uri)->assertNotFound();
     }
 
@@ -90,7 +90,7 @@ final class AttachmentsTest extends TestCase
     {
         $reader = $this->signIn();
         $attachment = $this->attachment(User::factory()->create());
-        ConversationParticipant::factory()->for($reader, 'user')->create(['conversation_id' => $attachment->message->conversation_id]);
+        ConversationParticipant::factory()->for($reader, 'user')->create(['conversation_id' => $attachment->message->conversation_id, 'joined_at' => now()->subDay()]);
         $this->patchJson('/api/attachments/'.$attachment->id)->assertForbidden();
         $this->deleteJson('/api/attachments/'.$attachment->id)->assertForbidden();
     }

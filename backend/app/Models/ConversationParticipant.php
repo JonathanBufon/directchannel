@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\UsesMicrosecondTimestamps;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class ConversationParticipant extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesMicrosecondTimestamps;
 
     public $timestamps = false;
 
@@ -57,6 +58,21 @@ final class ConversationParticipant extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->whereNull('left_at');
+    }
+
+    /** Apply the active participation boundary to a correlated messages query. */
+    public function scopeSeeingMessage(Builder $query): Builder
+    {
+        return $query->active()
+            ->whereColumn('conversation_participants.conversation_id', 'messages.conversation_id')
+            ->whereColumn('messages.accepted_at', '>=', 'conversation_participants.joined_at');
+    }
+
+    public function canSee(Message $message): bool
+    {
+        return Message::query()->whereKey($message->id)
+            ->whereExists($this->newQuery()->whereKey($this->id)->seeingMessage()->selectRaw('1'))
+            ->exists();
     }
 
     public function isActive(): bool

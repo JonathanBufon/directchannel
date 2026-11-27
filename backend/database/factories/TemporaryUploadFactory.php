@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Models\AccessGrant;
 use App\Models\Conversation;
 use App\Models\TemporaryUpload;
 use App\Models\User;
@@ -16,6 +17,9 @@ final class TemporaryUploadFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
+            'access_grant_id' => fn (array $attributes): int => AccessGrant::query()->active()->firstOrCreate(
+                ['user_id' => $attributes['user_id']], ['started_at' => now()]
+            )->id,
             'conversation_id' => Conversation::factory(),
             'storage_key' => 'temporary/'.fake()->uuid(),
             'original_name' => 'arquivo.pdf',

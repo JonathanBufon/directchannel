@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ConversationKind;
+use App\Models\Concerns\UsesMicrosecondTimestamps;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class Conversation extends Model
 {
-    use HasFactory;
+    use HasFactory, UsesMicrosecondTimestamps;
 
     public $timestamps = false;
 
@@ -66,6 +68,18 @@ final class Conversation extends Model
     public function temporaryUploads(): HasMany
     {
         return $this->hasMany(TemporaryUpload::class, 'conversation_id');
+    }
+
+    public function scopeWithVisibleDetails(Builder $query, User $user): Builder
+    {
+        return $query->with([
+            'participants' => fn (HasMany $query): HasMany => $query->active()->orderBy('id'),
+            'participants.user',
+            'latestMessage' => fn (HasOne $query): HasOne => $query->visibleTo($user)
+                ->select('messages.id', 'messages.conversation_id', 'messages.sender_participant_id', 'messages.accepted_at'),
+            'latestMessage.sender.user',
+            'group',
+        ]);
     }
 
     public function latestMessage(): HasOne

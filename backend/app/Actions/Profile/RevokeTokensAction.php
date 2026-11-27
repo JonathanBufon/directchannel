@@ -17,6 +17,7 @@ final class RevokeTokensAction
         $ids = $tokens->pluck('id');
         AccessGrantToken::whereIn('personal_access_token_id', $ids)->delete();
         $tokens->delete();
-        $user->accessGrants()->active()->whereDoesntHave('accessGrantTokens')->update(['revoked_at' => now()]);
+        $user->accessGrants()->active()->whereDoesntHave('accessGrantTokens')->get()
+            ->each->update(['revoked_at' => now()]);
     }
 }

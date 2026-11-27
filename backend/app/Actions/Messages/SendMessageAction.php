@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions\Messages;
 
+use App\Models\AccessGrantToken;
 use App\Models\Attachment;
 use App\Models\Block;
 use App\Models\Conversation;
@@ -33,22 +34,19 @@ final class SendMessageAction
                 })->exists();
                 abort_if($blocked, 403, 'Não é possível enviar mensagens enquanto houver bloqueio entre os contatos.');
             }
+            $grantId = AccessGrantToken::findOrFail($user->currentAccessToken()->getKey())->access_grant_id;
             $uploads = TemporaryUpload::whereIn('id', $uploadIds)->orderBy('id')->lockForUpdate()->get();
-            if ($uploads->count() !== count($uploadIds) || $uploads->contains(fn (TemporaryUpload $upload): bool => $upload->user_id !== $user->id || $upload->conversation_id !== $conversation->id
+            if ($uploads->count() !== count($uploadIds) || $uploads->contains(fn (TemporaryUpload $upload): bool => $upload->user_id !== $user->id || $upload->access_grant_id !== $grantId || $upload->conversation_id !== $conversation->id
                 || $upload->consumed_at !== null || $upload->expires_at->lessThanOrEqualTo(now())
             )) {
-                throw ValidationException::withMessages(['temporary_upload_ids' => 'Há uploads inválidos, expirados, já utilizados ou de outra conversa.']);
+                throw ValidationException::withMessages(['temporary_upload_ids' => 'Há uploads inválidos, expirados, já utilizados ou vinculados a outra conversa ou acesso.']);
             }
-            // Preserve the same precision used by the history cursor and membership boundary.
-            $message = new Message;
-            $message->setDateFormat('Y-m-d H:i:s.uP');
-            $message->fill([
+            $message = Message::create([
                 'conversation_id' => $conversation->id,
                 'sender_participant_id' => $sender->id,
                 'encrypted_body' => base64_decode($encryptedBody, true),
                 'accepted_at' => now(),
             ]);
-            $message->save();
             foreach ($uploads as $upload) {
                 Attachment::create(['message_id' => $message->id, 'storage_key' => $upload->storage_key, 'size_bytes' => $upload->size_bytes]);
                 $upload->update(['consumed_at' => now()]);

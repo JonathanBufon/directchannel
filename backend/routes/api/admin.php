@@ -19,5 +19,4 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'can:admin'])->group(functio
     Route::post('/reports/{report}/conclude', [AdminReportController::class, 'conclude']);
     Route::delete('/reports/{report}', [AdminReportController::class, 'destroy']);
     Route::get('/settings', [AdminSettingsController::class, 'show']);
-    Route::patch('/settings', [AdminSettingsController::class, 'update']);
 });

@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Support;
 
-use App\Models\AppSetting;
-
 final class AppSettings
 {
     public function maxUploadBytes(): int
     {
-        return $this->positiveInteger('max_upload_bytes', 25 * 1024 * 1024);
+        return $this->positiveInteger('max_upload_mb', 25) * 1024 * 1024;
     }
 
     public function logRetentionDays(): int
@@ -25,7 +23,7 @@ final class AppSettings
 
     private function positiveInteger(string $key, int $default): int
     {
-        $value = AppSetting::find($key)?->value;
+        $value = filter_var(config('directchannel.'.$key, $default), FILTER_VALIDATE_INT);
 
         return is_int($value) && $value > 0 ? $value : $default;
     }

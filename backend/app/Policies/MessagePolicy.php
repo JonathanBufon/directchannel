@@ -26,7 +26,7 @@ final class MessagePolicy
     {
         $participant = $message->conversation->activeParticipantFor($user);
 
-        return $participant !== null && $message->accepted_at->greaterThanOrEqualTo($participant->joined_at)
+        return $participant?->canSee($message) === true
             ? Response::allow() : Response::denyAsNotFound('Mensagem não encontrada.');
     }
 }

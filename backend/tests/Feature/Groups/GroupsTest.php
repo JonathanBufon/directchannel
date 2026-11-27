@@ -233,13 +233,18 @@ final class GroupsTest extends TestCase
         $this->assertSame(1, $group->activeMembers()->count());
     }
 
-    public function test_last_member_leaving_ends_group_and_keeps_history(): void
+    public function test_last_member_cannot_leave_without_successor_and_can_explicitly_close_group(): void
     {
         $group = Group::factory()->create();
         $owner = $this->member($group, true);
         $message = Message::factory()->create(['conversation_id' => $group->conversation_id, 'sender_participant_id' => $owner->id]);
         $this->signIn($owner->user);
-        $this->postJson("/api/groups/$group->id/leave")->assertNoContent();
+        $this->postJson("/api/groups/$group->id/leave")->assertUnprocessable()->assertJsonValidationErrors('successor_user_id');
+        $this->assertNull($owner->refresh()->left_at);
+        $this->assertSame(1, $group->activeMembers()->count());
+        $this->deleteJson("/api/groups/$group->id/members/$owner->user_id")->assertUnprocessable();
+        $this->assertNull($owner->refresh()->left_at);
+        $this->deleteJson("/api/groups/$group->id")->assertNoContent();
         $this->assertSame(0, $group->activeMembers()->count());
         $this->assertDatabaseHas('groups', ['id' => $group->id]);
         $this->assertDatabaseHas('messages', ['id' => $message->id]);

@@ -43,15 +43,11 @@ final class GroupContext
 
     public function join(Group $group, User $user, bool $responsible = false): void
     {
-        // Keep the precise reentry boundary even for messages in the same second.
-        $participant = new ConversationParticipant;
-        $participant->setDateFormat('Y-m-d H:i:s.uP');
-        $participant->fill([
+        $participant = ConversationParticipant::create([
             'conversation_id' => $group->conversation_id,
             'user_id' => $user->id,
             'joined_at' => now(),
         ]);
-        $participant->save();
         GroupMember::create(['participant_id' => $participant->id, 'group_id' => $group->id, 'is_responsible' => $responsible]);
     }
 
@@ -65,7 +61,7 @@ final class GroupContext
 
     public function ensureCanRemove(Group $group, GroupMember $member): void
     {
-        if ($member->is_responsible && $group->activeMembers()->count() > 1 && $group->activeMembers()->where('is_responsible', true)->count() === 1) {
+        if ($member->is_responsible && $group->activeMembers()->where('is_responsible', true)->count() === 1) {
             throw ValidationException::withMessages(['user' => 'Promova outro responsável antes de remover o último responsável ativo.']);
         }
     }

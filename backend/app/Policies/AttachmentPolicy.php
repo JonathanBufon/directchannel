@@ -20,7 +20,12 @@ final class AttachmentPolicy
 
     public function view(User $user, Attachment $attachment): Response
     {
-        return $this->create($user, $attachment->message->conversation);
+        $message = $attachment->message;
+        $participant = $message->conversation->activeParticipantFor($user);
+
+        return $participant?->canSee($message) === true
+            ? Response::allow()
+            : Response::denyAsNotFound('Anexo não encontrado.');
     }
 
     public function update(User $user, Attachment $attachment): Response

@@ -29,14 +29,14 @@ final class ConversationsController extends Controller
     {
         $result = $action->execute($request->user(), (int) $request->validated('user_id'));
 
-        return (new ConversationResource($show->execute($result['conversation'])))->response()->setStatusCode($result['created'] ? 201 : 200);
+        return (new ConversationResource($show->execute($result['conversation'], $request->user())))->response()->setStatusCode($result['created'] ? 201 : 200);
     }
 
-    public function show(Conversation $conversation, ShowConversationAction $action): ConversationResource
+    public function show(Request $request, Conversation $conversation, ShowConversationAction $action): ConversationResource
     {
         Gate::authorize('view', $conversation);
 
-        return new ConversationResource($action->execute($conversation));
+        return new ConversationResource($action->execute($conversation, $request->user()));
     }
 
     public function destroy(Request $request, Conversation $conversation, ArchiveConversationAction $action): JsonResponse
